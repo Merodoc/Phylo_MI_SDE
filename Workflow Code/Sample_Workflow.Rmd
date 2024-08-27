@@ -9,12 +9,11 @@ The Dataframe is a little messy atm, response variables are a little awkward as 
 
 ```{r}
 #Make sure to set wd depending on location, H:/ on laptop, Z:/ on desktop
-setwd("H:/Code")
 library("mice")
 library("ape")
-Mars <- read.csv("mars.csv", header=TRUE)
+Mars <- read.csv("Data/mars.csv", header=TRUE)
 Mars
-Mars_Avg <- read.csv("mars_avg.csv")
+Mars_Avg <- read.csv("Data/mars_avg.csv")
 Mars_Avg
 Marsimp <- Mars
 
@@ -64,7 +63,7 @@ Most of the stuff in this chunk is just Tree iteration work, potentially useful 
 ```{r}
 
 
-mars_tree <- read.tree("Mars_TimeTree.nwk")
+mars_tree <- read.tree("Data/Mars_TimeTree.nwk")
 plot(mars_tree)
 Mars_Avg
 
