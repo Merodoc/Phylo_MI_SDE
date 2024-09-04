@@ -76,7 +76,7 @@ end
 using Phylo
 
 #Import TimeTree of Species
-mars_tree = open(parse(RootedTree), Phylo.path("Data/Mars_TimeTree.nwk"))
+mars_tree = open(parse(RootedTree), Phylo.path("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/Mars_TimeTree.nwk"))
 
 plot(mars_tree)
 
@@ -85,8 +85,8 @@ using DataFrames
 
 # Read in Data
 # Will need to do similar data matching to that in R
-mars = CSV.read("Data/mars.csv", DataFrame)
-mars_avg = CSV.read("Data/mars_avg.csv", DataFrame)
+mars = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/mars.csv", DataFrame)
+mars_avg = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/mars_avg.csv", DataFrame)
 using Statistics
 
 
