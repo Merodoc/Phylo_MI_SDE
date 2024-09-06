@@ -87,7 +87,7 @@ using DataFrames
 # Read in Data
 # Will need to do similar data matching to that in R
 mars = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/mars.csv", DataFrame)
-mars_avg = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/mars_avg.csv", DataFrame)
+mars_avg = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/Imp_Mars_PVR25.csv", DataFrame)
 using Statistics
 
 
@@ -221,4 +221,20 @@ for leaf in leaves
     #add (parent, val) to the list of names
 
 
+
+dent = Vector{Float64}()
+
+for i in 1:length(getleafnames(mars_tree))
+    idx = findall(x -> x == getleafnames(mars_tree)[i], mars_avg[:,1])
+    #idx = parse.(Int, idx)
+    if length(idx) >= 1
+        idx = idx[1]
+    end
+    print(idx)
+    val = mars_avg[idx,2]
+    #print(val)
+    push!(dent, collect(val))
+end
+
+dent
 
