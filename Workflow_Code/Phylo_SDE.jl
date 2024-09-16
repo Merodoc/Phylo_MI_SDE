@@ -76,7 +76,10 @@ end
 using Phylo
 
 #Import TimeTree of Species
-mars_tree = open(parse(RootedTree), Phylo.path("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/Mars_TimeTree.nwk"))
+#Different paths for each device
+#C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code for PC
+#C:/PhD/Phylo_MI_SDE/Workflow_Code/ for campus
+mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Mars_TimeTree.nwk"))
 
 plot(mars_tree)
 plot(hummers, marker_z = trait)
@@ -86,15 +89,15 @@ using DataFrames
 
 # Read in Data
 # Will need to do similar data matching to that in R
-mars = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/mars.csv", DataFrame)
-mars_avg = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/Imp_Mars_PVR25.csv", DataFrame)
+mars = CSV.read("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/mars.csv", DataFrame)
+mars_avg = CSV.read("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Imp_Mars_PVR25.csv", DataFrame)
 using Statistics
 
 
 #Convert Dataframe rows to numerics and remove missing data (should not be a problem later obviously)
 
-filter!(row -> row.dentary != "NA", mars_avg)
-dentary = parse.(Float64,mars_avg[!,2])
+#filter!(row -> row.dentary != "NA", mars_avg)
+dentary = mars_avg[!,2]
 
 #Define the SDE for map_depthfirst2
 W = WienerProcess(0.0,0.0,0.0)
@@ -122,7 +125,6 @@ plot(mars_tree, showtips = false, marker_z = traits, linewidth = 2, markercolor 
 # Map the tree backwards
 # figure out how to get the pairs from the leaves - Pruning?
 
-plot(mars_tree)
 
 plot(mars_tree,
      size = (400, 800),
@@ -133,36 +135,36 @@ plot(mars_tree,
 
 # Get children for each node?
 
-function Ancestor_Path(tree)
+#function Ancestor_Path(tree)
     #This should allow us to iterator down a tree
-    root = first(nodenamefilter(isroot, tree))
-    function local!(val, node)
-        for ch in getchildren(tree, node)
-            branch = getinbound(mars_tree, ch)
+#    root = first(nodenamefilter(isroot, tree))
+#    function local!(val, node)
+#        for ch in getchildren(tree, node)
+#            branch = getinbound(mars_tree, ch)
             #Need to figure out how to get branches from names, or nodes from names
-            len = getlength(tree, branch)
+#            len = getlength(tree, branch)
             #this section here allows u to get time between nodes for when u come to this later
-            tspan = (0.0, len)
+#            tspan = (0.0, len)
 
             #Iterator seems to be working, now need to fix the SDE bit
 
             #can try to make the OU_Wrap function (Val, node, time)
-            local!(last(len), ch)
-        end
-    end
-    local!(start, root)
-end
+#            local!(last(len), ch)
+#        end
+#    end
+#    local!(start, root)
+#end
 
-function Attach_branch(tree, node)
-    branch = getinbound(tree, node)
-    len = getlength(tree, branch)
-end
+#function Attach_branch(tree, node)
+#    branch = getinbound(tree, node)
+#    len = getlength(tree, branch)
+#end
 
-get_Branches(tree) = map_depthfirst((val, node) -> Attach_branch(tree, node), 0., tree, Float64)
+#get_Branches(tree) = map_depthfirst((val, node) -> Attach_branch(tree, node), 0., tree, Float64)
 
-get_Branches(mars_tree)
+#get_Branches(mars_tree)
 
-root = first(nodenamefilter(isroot, mars_tree))
+#root = first(nodenamefilter(isroot, mars_tree))
 
 #for ch in getchildren(mars_tree, root)
     
@@ -197,8 +199,8 @@ for leaf in leaves
     end
     # not all children are leaves, so return to testing leaves until we find one that does
     #if all children of parent leaf are leaves then do stuff
-        bridgelen = Vector{Float64}()
-        #print(getnodename(mars_tree, parent))
+    bridgelen = Vector{Float64}()
+    #print(getnodename(mars_tree, parent))
     #optimizing this depends on what inputs the bridge needs
         for branch in getoutbounds(mars_tree, parent)
             len = getlength(mars_tree, branch)
@@ -208,13 +210,12 @@ for leaf in leaves
         #print(children)
         #leaves <- filter!(e->e∉children, leaves)
     
-        push!(leaves, getnodename(mars_tree, parent))
-        #Should be able to use bridgelen for bridge operations we wanna try
+    push!(leaves, getnodename(mars_tree, parent))
+    #Should be able to use bridgelen for bridge operations we wanna try
 
-        #Currently breaks on root node
-        #If Statement before the push for isroot: it breaks the loop there
-    end
-
+    #Currently breaks on root node
+    #If Statement before the push for isroot: it breaks the loop there
+end
     #if i get here, get branch lengths for the outbound branches of parent,
     #get the bridge here and take correct point as new value for parent
     #remove children from the list of names
@@ -222,7 +223,11 @@ for leaf in leaves
 
 
 
-dent = Vector{Float64}()
+
+
+
+
+    dent = Vector{Float64}()
 
 for i in 1:length(getleafnames(mars_tree))
     idx = findall(x -> x == getleafnames(mars_tree)[i], mars_avg[:,1])
