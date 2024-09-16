@@ -21,20 +21,28 @@ leaves = Vector{String}()
 
 
 # for loop over all children from root, if child name in getleafnames(tree) then we see if other branch is a child
-leaves = getleafnames(mars_tree)
+#Turning this into a function
+
+function Leaf_Prune(tree, start_vals)
+    #Currently this iterates through all the nodes in the tree from leaves to root and returns the list
+leaves = getleafnames(tree)
+root = first(nodenamefilter(isroot, tree))
 iter = 0
 for leaf in leaves
+    if isroot(mars_tree, leaf)
+        return leaves
+    end
     #should be a dictionary of leaves and their values
-    parent = getparent(mars_tree, leaf)
+    parent = getparent(tree, leaf)
     children = Vector{String}()
     #print(iter)
     iter = iter +1
     #might be good time for a try/catch
     try
         #test that all the children of the parent leaf are leaves
-        for ch in getchildren(mars_tree, parent)
-            name = getnodename(mars_tree, ch)
-            if name in getleafnames(mars_tree)
+        for ch in getchildren(tree, parent)
+            name = getnodename(tree, ch)
+            if name in getleafnames(tree)
                 push!(children, name)
                 #print(name)
                 continue
@@ -51,15 +59,15 @@ for leaf in leaves
     bridgelen = Vector{Float64}()
     #print(getnodename(mars_tree, parent))
     #optimizing this depends on what inputs the bridge needs
-        for branch in getoutbounds(mars_tree, parent)
-            len = getlength(mars_tree, branch)
+        for branch in getoutbounds(tree, parent)
+            len = getlength(tree, branch)
             push!(bridgelen, len)
         end
-        #print(bridgelen)
-        #print(children)
-        #leaves <- filter!(e->e∉children, leaves)
+        print(bridgelen)
+
+        #bridgelen works - we can now do the diffusion bridge on them
     
-    push!(leaves, getnodename(mars_tree, parent))
+    push!(leaves, getnodename(tree, parent))
     #Should be able to use bridgelen for bridge operations we wanna try
 
     #Currently breaks on root node
@@ -71,8 +79,28 @@ end
     #add (parent, val) to the list of names
 
 
-leaves
+return leaves
+end
 
-#Turning this into a function
+start_vals = mars_avg[!,2]
+start_vals
+pruned = Leaf_Prune(mars_tree)
 
-function = Leaf_Prune(tree)
+for i in 1:length(getleafnames(mars_tree))
+    idx = findall(x -> x == getleafnames(mars_tree)[i], mars_avg[:,1])
+    #idx = parse.(Int, idx)
+    if length(idx) >= 1
+        idx = idx[1]
+    end
+    print(idx)
+    val = mars_avg[idx,2]
+    #print(val)
+end
+
+mars_avg
+findall(x -> x == getleafnames(mars_tree), mars_avg[!,1])
+
+species = mars_avg[!,1]
+leaves = getleafnames(mars_tree)
+
+findall(x -> x == species, leaves)
