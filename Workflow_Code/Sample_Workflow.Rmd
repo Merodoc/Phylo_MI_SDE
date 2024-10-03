@@ -11,9 +11,9 @@ The Dataframe is a little messy atm, response variables are a little awkward as 
 #Make sure to set wd depending on location, H:/ on laptop, Z:/ on desktop
 library("mice")
 library("ape")
-Mars <- read.csv("Data/mars.csv", header=TRUE)
+Mars <- read.csv("mars.csv", header=TRUE)
 Mars
-Mars_Avg <- read.csv("Data/mars_avg.csv")
+Mars_Avg <- read.csv("mars_avg.csv")
 Mars_Avg
 Marsimp <- Mars
 
@@ -63,7 +63,7 @@ Most of the stuff in this chunk is just Tree iteration work, potentially useful 
 ```{r}
 
 
-mars_tree <- read.tree("Data/Mars_TimeTree.nwk")
+mars_tree <- read.tree("newtree.nwk")
 plot(mars_tree)
 Mars_Avg
 
@@ -72,7 +72,9 @@ mars_avg2 <- Mars_Avg[which(Mars_Avg$X %in% mars_tree$tip.label),]
 rownames(mars_avg2) <- mars_avg2$X
 mars_avg2 <- mars_avg2[match(mars_tree$tip.label, rownames(mars_avg2)),]
 
+```
 
+```{r}
 #Set a new column in  dataframe denoting the node value of the tip of the organism
 for (i in 1:length(mars_tree$tip.label)) {
   for (j in 1:length(mars_avg2$X)) {
@@ -142,8 +144,7 @@ library(phytools)
 #Data fixing so tree matches given data
 mars_dat <- mars_avg2[,c("dentary", "dentary.1", "dentary.2")]
 mars_dat
-mars_dat2 <- mars_dat[-21,]
-mars_tree2 <- drop.tip(mars_tree,21)
+
 
 # Independent Contrasts tests
 x1 <- pic(mars_avg2$dentary[-21], mars_tree2, scaled = FALSE)
@@ -174,9 +175,8 @@ mars_tree3 <- drop.tip(mars_tree2, missingfromtree)
 rownames(MEANS2) <- MEANS2$Species
 MEANS2 <- MEANS2[match(mars_tree2$tip.label, rownames(MEANS2)),]
 trait <- MEANS2[,2]
-trait <- trait[-missingfromtree]
-X <- PVRdecomp(mars_tree3, scale = TRUE)
-y2 = PVR(X, trait = trait, method = "moran")
+X <- PVRdecomp(mars_tree, scale = TRUE)
+#y2 = PVR(X, trait = trait, method = "moran")
 
 
 ```
@@ -184,17 +184,17 @@ y2 = PVR(X, trait = trait, method = "moran")
 Now we need to Figure out how to get the phylogeny to influence our Missing Data Imputation
 
 ```{r}
-missingfromtree2 = which(!(Marsimp$Species %in% mars_tree3$tip.label))
+missingfromtree2 = which(!(Marsimp$Species %in% mars_tree$tip.label))
 
 marsimp2 = Marsimp[-missingfromtree2,]
 marsimp2$Species = as.factor(marsimp2$Species)
 marsimp2
-X <- PVRdecomp(mars_tree3, scale = TRUE)
+X <- PVRdecomp(mars_tree, scale = TRUE)
 
 evec <- X@Eigen$vectors
 
 edf <- data.frame(evec)
-edf$Species <- mars_tree3$tip.label
+edf$Species <- mars_tree$tip.label
 
 marsimp3 <- merge(marsimp2, edf, by="Species")
 
@@ -204,7 +204,7 @@ stripplot(imp3, dentary ~.imp)
 plot(imp3)
 # Extract complete imputed data
 
-imp3.dat <- complete(imp2, action = "long")
+imp3.dat <- complete(imp3, action = "long")
 
 
 
@@ -228,6 +228,15 @@ POOLED <- pool.scalar(MEAN, VAR.MEAN, nrow(imp2$data))
 
 data.frame(pooled.mean = mean(MEAN), mean.var = mean(VAR.MEAN), btw.var = var(MEAN), pooled.var = mean(VAR.MEAN) + (1+1/length(MEAN))*var(MEAN))
 
-write.csv(MEANS, "Imp_Mars_PVR25.csv", row.names=FALSE)
+library("PVR")
+library("plyr")
+MEANS <- ddply(imp3.dat, .(Species), summarize, mean=mean(dentary))
+
+
+#Need to match tree and complete data (cause tree is missing some species)
+
+
+
+write.csv(MEANS, "Imp_Mars_PVR25new5.csv", row.names=FALSE)
 
 ```

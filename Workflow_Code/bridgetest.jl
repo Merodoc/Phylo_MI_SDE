@@ -55,7 +55,7 @@ Xhat = Vector{Float64}()
 anc = 0.5
 
 for n in N
-    B = sample(0:dt:s, WienerBridge(s,v), start)
+    B = sample(0:dt:s, WienerBridge(s,v))
     plot!(B.tt, B.yy)
     idx = findall(x -> x == anc, B.tt)
     val = B.yy[idx][1]
