@@ -16,7 +16,7 @@ Bridge.σ(t,x,P::OrnsteinUhlenbeck) = P.σ
 
 W = sample(0:0.01:10, Wiener())
 X = solve(EulerMaruyama(), 0.1, W, OrnsteinUhlenbeck(2.0,1.0))
-plot(X, lebel = "X")
+plot(X, level = "X")
 X
 
 
@@ -62,18 +62,13 @@ for n in N
     push!(Xhat, val)
 end
 
-Xhat
+
 
 using Statistics
 
-mean(Xhat)
-
 #Kernel plots here could be useful
 
-var(Xhat)
-plot(N, Xhat,seriestype =scatter)
-
-function Phylo_Bridge(start, fin, fin_time, anc, time, dt, samples)
+function Phylo_Bridge(start, fin, fin_time, anc, dt, samples)
     N = 1:samples
     Xhat = Vector{Float64}()
 
@@ -86,4 +81,3 @@ function Phylo_Bridge(start, fin, fin_time, anc, time, dt, samples)
 
 return Xhat
 end
-
