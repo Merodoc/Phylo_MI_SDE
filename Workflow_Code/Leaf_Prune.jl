@@ -1,11 +1,4 @@
 using Phylo
-
-
-mars_tree = open(parse(RootedTree), Phylo.path("C:/PhD/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
-#"C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/Mars_TimeTree.nwk"
-#C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Mars_TimeTree.nwk
-
-
 using CSV
 using DataFrames
 
@@ -18,7 +11,7 @@ using Bridge
 #C:/PhD/Phylo_MI_SDE/Workflow_Code
 #C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code
 
-leaves = Vector{String}()
+
 
 function Phylo_Bridge(start, fin, fin_time, anc, dt, samples)
     #start = start value
@@ -131,78 +124,12 @@ end
 return data
 end
 
-start_vals = mars_avg[!,2]
-start_vals
-pruned = Leaf_Prune(mars_tree, start_vals)
-
-for i in 1:length(getleafnames(mars_tree))
-    idx = findall(x -> x == getleafnames(mars_tree)[i], mars_avg[:,1])
-    #idx = parse.(Int, idx)
-    if length(idx) >= 1
-        idx = idx[1]
-    end
-    print(idx)
-    val = mars_avg[idx,2]
-    #print(val)
-end
-
-mars_avg
-findall(x -> x == getleafnames(mars_tree), mars_avg[!,1])
-
-species = mars_avg[!,1]
-leaves = getleafnames(mars_tree)
-
-test = findall(x -> x == species, leaves)
 
 
-mars_avg2 = DataFrame(Species = leaves)
-data = Vector{Float64}()
-for i in leaves
-    idx = findall(x -> x == i, species)
-    println(idx)
-    try
-        push!(data, mars_avg[idx[1],2])
-    catch
-        println(i)
-        continue
-    end
-end
-
-leaves = getleafnames(mars_tree)
 
 
-df = DataFrame(Nodes = leaves, Values = start_vals)
-df[!, :Child1] .= missing
-
-pruned
-
-row = filter(row -> row.Nodes == "'98'", pruned)
-
-using Plots
-
-Val_Dict = Dict()
-
-for i in 1:length(pruned.Nodes)
-    push!(Val_Dict, pruned.Nodes[i] => pruned.Vals[i])
-end
-
-Val_Dict
-
-plot(mars_tree, showtips = false, marker_z = Val_Dict)
-plot(mars_tree, size = (400,800), linecolor = :orange, linewidth = 5, marker_size = 10, markercolor = :steelblue, markerstrokecolor = :white,
-series_annotations = text.(round.(pruned.Vals, digits = 2),10,:center,:center,:black), tipfont = (4,))
-
-Val_Dict.keys
-
-CSV.write("BrownianBridge_Test2.csv", pruned)
-
-v = []
-children = ["78", "38"]
-push!(v, children)
-df[!, :Children] .= v
-
-newData = pruned[!, 1:3]
-newData[!,:Var] = pruned.BridgeVar
 
 
-CSV.write("BrownianBridge_Test3.csv", newData)
+
+
+
