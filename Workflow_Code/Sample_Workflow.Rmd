@@ -230,6 +230,7 @@ data.frame(pooled.mean = mean(MEAN), mean.var = mean(VAR.MEAN), btw.var = var(ME
 
 library("PVR")
 library("plyr")
+library("dplyr")
 MEANS <- ddply(imp3.dat, .(Species), summarize, mean=mean(dentary))
 
 
@@ -239,4 +240,166 @@ MEANS <- ddply(imp3.dat, .(Species), summarize, mean=mean(dentary))
 
 write.csv(MEANS, "Imp_Mars_PVR25new5.csv", row.names=FALSE)
 
+```
+
+```{r}
+
+
+newdata = split(imp3.dat, f = imp3.dat$.imp)
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(dentary))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIDentaryArticularWidth.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(dentary.1))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIDentaryArticularLength.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(dentary.2))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIDentaryForamenLength.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(dentary.3))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIDentaryRowWidthatm4.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(dentary.4))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIDentaryHeightatm4.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(dentary.5))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIDentaryHeightatp3.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(scapula))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIscapulainfraspinouswidth.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(scapula.1))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIscapulainfraspinousLength.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(scapula.2))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIScapulaGlenoidArticularFacetLength.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(scapula.3))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIScapulaGlenoidMaxLength.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(scapula.4))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIScapulaGlenoidWidth.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(scapula.5))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIScapulaAngleScapulaNeck.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(scapula.6))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIScapulaAgnelCaudalBorder.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+Output = data.frame(Species = sort(edf$Species))
+iter = 1
+for (i in newdata) {
+  current = i
+  iter = iter + 1
+  MEANS <- ddply(i, .(Species), summarize, mean=mean(humerus))
+  Output[,iter] = MEANS$mean
+}
+Filename = "MarsMIScapulaHumerusHeadLength.csv"
+write.csv(Output, Filename, row.names = FALSE)
+
+
+###Got up to Humerus in File writing - Do Rest Tomorrow
 ```
