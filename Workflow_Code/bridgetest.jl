@@ -73,7 +73,7 @@ function Phylo_Bridge(start, fin, fin_time, anc, dt, samples)
     Xhat = Vector{Float64}()
 
     for n in N
-        B = sample(0:dt:start, WienerBridge(fin_time,fin), start)
+        B = sample(0:dt:fin_time, WienerBridge(fin_time,fin), start)
         idx = findall(x -> x == anc, B.tt)
         val = B.yy[idx][1]
         push!(Xhat, val)
@@ -81,3 +81,5 @@ function Phylo_Bridge(start, fin, fin_time, anc, dt, samples)
 
 return Xhat
 end
+
+test = Phylo_Bridge(5., 4., 10., 3., 0.1, 100.)

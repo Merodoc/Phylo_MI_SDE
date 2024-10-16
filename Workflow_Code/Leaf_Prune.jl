@@ -1,30 +1,36 @@
 using Phylo
 
 
-mars_tree = open(parse(RootedTree), Phylo.path("C:/PhD/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
+mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
 #"C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/Mars_TimeTree.nwk"
 #C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Mars_TimeTree.nwk
-plot(mars_tree)
+
 
 using CSV
 using DataFrames
 
 # Read in Data
 # Will need to do similar data matching to that in R
-mars = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/mars.csv", DataFrame)
-mars_avg = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Imp_Mars_PVR25new5.csv", DataFrame, types = [String, Float64])
+mars = CSV.read("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/mars.csv", DataFrame)
+mars_avg = CSV.read("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Imp_Mars_PVR25new5.csv", DataFrame, types = [String, Float64])
 using Statistics
+using Bridge
 #C:/PhD/Phylo_MI_SDE/Workflow_Code
 #C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code
 
 leaves = Vector{String}()
 
 function Phylo_Bridge(start, fin, fin_time, anc, dt, samples)
+    #start = start value
+    #fin = final value
+    #fin_time = total time
+    #anc = time point of the ancestor node
+    #samples = number of repeats
     N = 1:samples
     Xhat = Vector{Float64}()
 
     for n in N
-        B = sample(0:dt:start, WienerBridge(fin_time,fin), start)
+        B = sample(0:dt:fin_time, WienerBridge(fin_time,fin), start)
         idx = findall(x -> x == anc, B.tt)
         val = B.yy[idx][1]
         push!(Xhat, val)
@@ -32,6 +38,7 @@ function Phylo_Bridge(start, fin, fin_time, anc, dt, samples)
 
 return Xhat
 end
+
 
 
 # for loop over all children from root, if child name in getleafnames(tree) then we see if other branch is a child
@@ -42,53 +49,60 @@ function Leaf_Prune(tree, start_vals)
 leaves = getleafnames(tree)
 root = first(nodenamefilter(isroot, tree))
 data = DataFrame(Nodes = leaves, Vals = start_vals)
+data[!,:Child1] .= 0.
+data[!, :Child2] .= 0.
 iter = 0
 idx = 0
+vals = start_vals
 for leaf in leaves
     idx = idx + 1
     if isroot(mars_tree, leaf)
-        return leaves
+        println("REACHED ROOT")
+        #bridgelen = Vector{Float64}()
+        #print(getnodename(mars_tree, parent))
+        #optimizing this depends on what inputs the bridge needs
+                #for branch in getoutbounds(tree, parent)
+                #    len = getlength(tree, branch)
+                #    push!(bridgelen, len)
+                #end
+                #time = sum(bridgelen)
+                #push!(data, (leaf,0, bridgelen[1], bridgelen[2]))
+        return data
+        break
     end
     #should be a dictionary of leaves and their values
     parent = getparent(tree, leaf)
-    children = Vector{String}()
+    if parent ∈ leaves 
+        continue
+        println("PARENT IN LEAVES")
+    end
     #print(iter)
     iter = iter +1
     #might be good time for a try/catch
-    try
         #test that all the children of the parent leaf are leaves
-        for ch in getchildren(tree, parent)
-            name = getnodename(tree, ch)
-            if name in getleafnames(tree)
-                push!(children, name)
-
-                #print(name)
-                continue
-            else 
-                break
-            end
-        end
-    catch
-        print("CAUGHT")
-        continue
-    end
+    ch = getchildren(tree, parent)
+    if getnodename(tree, ch[1]) ∈ leaves && getnodename(tree, ch[2]) ∈ leaves
     # not all children are leaves, so return to testing leaves until we find one that does
     #if all children of parent leaf are leaves then do stuff
-    bridgelen = Vector{Float64}()
+            bridgelen = Vector{Float64}()
     #print(getnodename(mars_tree, parent))
     #optimizing this depends on what inputs the bridge needs
-        for branch in getoutbounds(tree, parent)
-            len = getlength(tree, branch)
-            push!(bridgelen, len)
-        end
-        time = sum(bridgelen)
+            for branch in getoutbounds(tree, parent)
+                len = getlength(tree, branch)
+                push!(bridgelen, len)
+            end
+            time = sum(bridgelen)
         #have to figure out a better way to assign values to child nodes, maybe make a val, node dict in initialization
+        
         #bridgesim = Phylo_Bridge()
         #bridgelen works - we can now do the diffusion bridge on them
     
-    push!(data, (parent,0))
+        
+    push!(data, (parent,0, bridgelen[1], bridgelen[2]))
+    push!(leaves, parent)
     #Should be able to use bridgelen for bridge operations we wanna try
 
+            
     #Currently breaks on root node
     #If Statement before the push for isroot: it breaks the loop there
 end
@@ -97,7 +111,7 @@ end
     #remove children from the list of names
     #add (parent, val) to the list of names
 
-
+end
 return data
 end
 
@@ -138,4 +152,12 @@ for i in leaves
     end
 end
 
-data
+leaves = getleafnames(mars_tree)
+
+
+df = DataFrame(Nodes = leaves, Values = start_vals)
+df[!, :Child1] .= missing
+
+pruned
+
+row = filter(row -> row.Nodes == "'98'", pruned)
