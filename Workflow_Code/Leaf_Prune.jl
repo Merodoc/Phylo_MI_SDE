@@ -37,7 +37,7 @@ end
 # for loop over all children from root, if child name in getleafnames(tree) then we see if other branch is a child
 #Turning this into a function
 
-function Leaf_Prune(tree, start_vals)
+function Leaf_Prune(tree, start_vals, dt = 0.01, samples = 100)
     #Currently this iterates through all the nodes in the tree from leaves to root and returns the list
 leaves = getleafnames(tree)
 root = first(nodenamefilter(isroot, tree))
@@ -57,7 +57,6 @@ vals = start_vals
 for leaf in leaves
     idx = idx + 1
     if isroot(mars_tree, leaf)
-        println("REACHED ROOT")
         #bridgelen = Vector{Float64}()
         #print(getnodename(mars_tree, parent))
         #optimizing this depends on what inputs the bridge needs
@@ -99,10 +98,10 @@ for leaf in leaves
             end
 
             time = sum(bridgelen)
+            # Need some Error work in here to guarantee that timescale is divisible by dt
             time = round(time, digits = 2)
             anc_time = round(bridgelen[1], digits = 2)
-            println(anc_time)
-            bridgesim = Phylo_Bridge(val1, val2, time, anc_time, 0.01, 100)
+            bridgesim = Phylo_Bridge(val1, val2, time, anc_time, dt, samples)
             Xhat = mean(bridgesim)
             Var = var(bridgesim)
 

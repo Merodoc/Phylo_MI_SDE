@@ -103,20 +103,30 @@ function WienerAnim3(t, dt, n)
         #need to account for the reverse of the time, not reverse of the value
         #Otherwise should be manageable 
         for i in 1:length(W.yy)
-            if W.yy[i] > reverse(W2.yy)[i]-0.5 && W.yy[i] < reverse(W2.yy)[i] + 0.5
+            if W.yy[i] > reverse(W2.yy[i])-0.5 && W.yy[i] < reverse(W2.yy)[i] + 0.5
                 println("Bridge Match")
-                newW2 = reverse(W2.yy)[1:i]
+                println(W.tt[i])
+                println(W.yy[i])
+                println(reverse(W2.tt)[i])
+                println(W2.yy[i])
+                return println("Test")
+                newW2 = W2.yy[1:length(W.yy)-i]
+
                 for j in i:length(W.yy)
                     push!(newW2, W.yy[j])
                 end
-                W2.yy = newW2
+
                 break
             end
         end
 
         push!(Y, W.yy)
         push!(T, W.tt)
-        push!(Y2, W2.yy)
+        try
+        push!(Y2, newW2)
+        catch
+            push!(Y2, W2.yy)
+        end
         push!(T2, reverse(W2.tt))
     end
     anim = @animate for x = 1:length(T[1])
@@ -129,3 +139,4 @@ return anim
 end
     
 test = WienerAnim3(10, 0.1, 50)
+gif(test)
