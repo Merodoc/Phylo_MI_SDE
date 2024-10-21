@@ -76,94 +76,184 @@ for species in gdf
     push!(sampled_df, row)
 end
 
-function Leaf_Prune2(tree, df, variable, species = "Species", dt = 0.01, samples = 100)
-    #Currently this iterates through all the nodes in the tree from leaves to root and returns the list
-root = first(nodenamefilter(isroot, tree))
-data = DataFrame()
-data[!, :Species] = df[!, species]
-data[!, :Variable] = df[!, variable]
-v = []
-children = ["NA", "NA"]
-push!(v, children)
-data[!, :Children] .= v
-data[!,:Child1] .= 0.
-data[!,:Child1Val] .= 0.
-data[!, :Child2] .= 0.
-data[!,:Child2Val] .= 0.
-data[!,:BridgeVar] .= 0.
-iter = 0
-idx = 0
-vals = start_vals
-for leaf in leaves
-    idx = idx + 1
-    if isroot(mars_tree, leaf)
-        #bridgelen = Vector{Float64}()
-        #print(getnodename(mars_tree, parent))
-        #optimizing this depends on what inputs the bridge needs
-                #for branch in getoutbounds(tree, parent)
-                #    len = getlength(tree, branch)
-                #    push!(bridgelen, len)
-                #end
-                #time = sum(bridgelen)
-                #push!(data, (leaf,0, bridgelen[1], bridgelen[2]))
-        return data
-        break
-    end
-    #should be a dictionary of leaves and their values
-    parent = getparent(tree, leaf)
-    if parent ∈ leaves 
-        continue
-        #println("PARENT IN LEAVES")
-    end
-    #print(iter)
-    iter = iter +1
-    #might be good time for a try/catch
-        #test that all the children of the parent leaf are leaves
-    ch = getchildren(tree, parent)
-    children = [getnodename(tree, ch[1]), getnodename(tree,ch[2])]
-    if getnodename(tree, ch[1]) ∈ leaves && getnodename(tree, ch[2]) ∈ leaves
 
-        #Pull existing trait values from the data frame
-        row1 = filter(row -> row.Species == getnodename(tree, ch[1]), data)
-        row2 = filter(row -> row.Species == getnodename(tree, ch[2]), data)
-        val1 = row1.Variable[1]
-        val2 = row2.Variable[1]
-        bridgelen = Vector{Float64}()
-    #print(getnodename(mars_tree, parent))
-    #optimizing this depends on what inputs the bridge needs
 
-            for branch in getoutbounds(tree, parent)
-                len = getlength(tree, branch)
-                push!(bridgelen, len)
+# Leaf_Prune2 is an advancement on Leaf_Prune allowing us to import a DataFrame containing multiple variables and run the prune bridge method on them
+
+# Read the files in from directory
+data = CSV.read(string(dir, Files[1]), DataFrame)
+# Remove the "Individual" factor as this is functionally useless in this sampling regime
+data = select!(data, Not([:Individual]))
+
+#Remove Bad Traits now
+
+data = select!(data, Not([:Calcaneus],[:"Calcaneus.4"]))
+# Group each species by their resulting traits 
+gdf = groupby(data, :Species)
+sampled_df = DataFrame()
+
+# Iterate over the grouped data frame to sample a random measurement for each variable from each Species
+titles = names(gdf[1])
+Random.seed!(123)
+for i in titles 
+    sampled_df[!, i] = []
+end
+
+for species in gdf
+    iter = 1
+    row = Vector()
+    for col in eachcol(species)
+        if iter == 1
+            push!(row, col[1])
+        else 
+        val = sample(col)
+        push!(row, val)
+        end
+    iter = iter + 1
+    end
+    push!(sampled_df, row)
+end
+
+dentary_mi1_1 = Leaf_Prune2(mars_tree, sampled_df, "dentary")
+
+plot_dict = Dict()
+
+for i in eachrow(dentary_mi1_1)
+    push!(plot_dict, i[1] => i[2])
+end
+
+plot(mars_tree, showtips = false, marker_z = plot_dict, linewidth = 5, markersize = 15)
+
+
+# Now need to make the bridges sample from the point
+# Bridge Should sample and use those samples
+# Cannot pull bridge path out yet
+
+data_test = CSV.read(string(dir, Files[1]), DataFrame)
+data_test = select!(data_test, Not([:Individual]))
+
+sampled_df = DataFrame()
+titles = names(gdf[1])
+for i in titles
+    if "NA" ∈ data_test[!, i]
+        println(string("Trait: ", i, " removed due to missing values"))
+        data_test = select!(data_test, Not([i]))
+    else
+    sampled_df[!, i] = []
+    end
+end
+
+gdf = groupby(data_test, :Species)
+
+
+for species in gdf
+    iter = 1
+    row = Vector()
+    for col in eachcol(species)
+        if iter == 1
+            push!(row, col[1])
+        else 
+        val = sample(col)
+        push!(row, val)
+        end
+    iter = iter + 1
+    end
+    push!(sampled_df, row)
+end
+
+function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
+    #Read MI files from start_dir
+    Files = readdir(start_dir)
+    try
+        #mkdir(end_dir)
+    catch
+        return println("Invalid Return Directory")
+    end
+
+    for file in Files
+        println(file)
+        data = CSV.read(string(start_dir, file), DataFrame)
+        # Remove the "Individual" factor as this is functionally useless in this sampling regime
+        data = select!(data, Not([:Individual]))
+        iter_data = DataFrame()
+        iter_data[!, :Species] = names(data)
+        # Iterate over all traits
+        # Create a new empty data frame that will contain the sampled trait values
+        # Remove any traits that the Multiple Imputation couldn't handle
+        titles = names(data)
+
+   
+        for i in 1:init_samples
+            sampled_df = DataFrame()
+            for title in titles
+                if "NA" ∈ data[!, title]
+                    #println(string("Trait: ", title, " removed due to missing values"))
+                    data = select!(data, Not([title]))
+                else
+                    #println("In Else Loop")
+                    sampled_df[!, title] = []
+                end
             end
+            titles = names(sampled_df)
+        # Group Data by Species for sampling
+            gdf = groupby(data, :Species)
+        
+        # Sample the Species data for each trait and add to the sampled dataframe
+            for species in gdf
+                iter = 1
+                row = Vector()
+                    for col in eachcol(species)
+                        if iter == 1
+                        push!(row, col[1])
+                        else 
+                            val = sample(col)
+                            push!(row, val)
+                        end
+                        iter = iter + 1
+                    end
+                push!(sampled_df, row)
+            end
+        # We should now have a data frame that has a sample per species from every variable
 
-            time = sum(bridgelen)
-            # Need some Error work in here to guarantee that timescale is divisible by dt
-            time = round(time, digits = 2)
-            anc_time = round(bridgelen[1], digits = 2)
-            bridgesim = Phylo_Bridge(val1, val2, time, anc_time, dt, samples)
-            Xhat = mean(bridgesim)
-            Var = var(bridgesim)
+            for trait in names(sampled_df)
+                if trait == "Species"
+                    continue
+                else
+                    trait_data = DataFrame()
+                    for j in 1:max_iter
+                                       
+                        results = Leaf_Prune2(mars_tree, sampled_df, trait)
+                        if j == 1
+                            species = results[!, :Species]
+                            trait_data[!, :Species] = species
+                        end
+                        title = string("Iter", j)
+                        #filename = string(end_dir, title, "sample", i, ".csv")
+                        #CSV.write(filename, results)
+                        trait_vals = results[!, :Variable]
+                        trait_data[!, title] = trait_vals
+                    end
+                end
+                trait_split = split(trait, ".")
+                if length(trait_split) == 2
+                    trait_name = string(trait_split[1], trait_split[2])
+                    filename = string(end_dir, trait_name, "_MISample", i, ".csv")
+                    CSV.write(filename, trait_data) 
+                else
+                    filename = string(end_dir, trait, "_MISample", i, ".csv")
+                    CSV.write(filename, trait_data)   
 
-        #bridgelen works - we can now do the diffusion bridge on them
-    push!(data, (parent,Xhat, children, bridgelen[1], val1, bridgelen[2], val2, Var))
-    push!(leaves, parent)
-    #Should be able to use bridgelen for bridge operations we wanna try
-
-            
-    #Currently breaks on root node
-    #If Statement before the push for isroot: it breaks the loop there
+                end               
+            end
+        end
+    end
 end
-    #if i get here, get branch lengths for the outbound branches of parent,
-    #get the bridge here and take correct point as new value for parent
-    #remove children from the list of names
-    #add (parent, val) to the list of names
 
-end
-return data
-end
-leaves = getleafnames(mars_tree)
-Base.load_InteractiveUtils
-sort!(sampled_df, Species = leaves)
 
-Leaf_Prune2(mars_tree, sampled_df, "dentary")
+
+dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
+enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_Results_211024/"
+
+Phy_Bridge_Sim(dir, enddir, mars_tree, 5, 5)
+
+
