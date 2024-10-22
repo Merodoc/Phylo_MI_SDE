@@ -52,126 +52,20 @@ end
 
 dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
 enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_Results_1/"
-Random.seed!(123)
-PhyMIR_Analyze_dir(dir, enddir, mars_tree)
-mkdir(enddir)
 
-Files = readdir(dir)
-
-data = CSV.read(string(dir, Files[1]), DataFrame)
-data = select!(data, Not([:Individual]))
-gdf = groupby(data, :Species)
-
-sampled_df = DataFrame()
-titles = names(gdf[1])
-for i in titles 
-    sampled_df[!, i] = []
-end
-for species in gdf
-    row = Vector()
-    for col in eachcol(species)
-        sample = rand(1:length(col))
-        push!(row, col[sample])
-    end
-    push!(sampled_df, row)
-end
-
-
-
-# Leaf_Prune2 is an advancement on Leaf_Prune allowing us to import a DataFrame containing multiple variables and run the prune bridge method on them
-
-# Read the files in from directory
-data = CSV.read(string(dir, Files[1]), DataFrame)
-# Remove the "Individual" factor as this is functionally useless in this sampling regime
-data = select!(data, Not([:Individual]))
-
-#Remove Bad Traits now
-
-data = select!(data, Not([:Calcaneus],[:"Calcaneus.4"]))
-# Group each species by their resulting traits 
-gdf = groupby(data, :Species)
-sampled_df = DataFrame()
-
-# Iterate over the grouped data frame to sample a random measurement for each variable from each Species
-titles = names(gdf[1])
-Random.seed!(123)
-for i in titles 
-    sampled_df[!, i] = []
-end
-
-for species in gdf
-    iter = 1
-    row = Vector()
-    for col in eachcol(species)
-        if iter == 1
-            push!(row, col[1])
-        else 
-        val = sample(col)
-        push!(row, val)
-        end
-    iter = iter + 1
-    end
-    push!(sampled_df, row)
-end
-
-dentary_mi1_1 = Leaf_Prune2(mars_tree, sampled_df, "dentary")
-
-plot_dict = Dict()
-
-for i in eachrow(dentary_mi1_1)
-    push!(plot_dict, i[1] => i[2])
-end
-
-plot(mars_tree, showtips = false, marker_z = plot_dict, linewidth = 5, markersize = 15)
-
-
-# Now need to make the bridges sample from the point
-# Bridge Should sample and use those samples
-# Cannot pull bridge path out yet
-
-data_test = CSV.read(string(dir, Files[1]), DataFrame)
-data_test = select!(data_test, Not([:Individual]))
-
-sampled_df = DataFrame()
-titles = names(gdf[1])
-for i in titles
-    if "NA" ∈ data_test[!, i]
-        println(string("Trait: ", i, " removed due to missing values"))
-        data_test = select!(data_test, Not([i]))
-    else
-    sampled_df[!, i] = []
-    end
-end
-
-gdf = groupby(data_test, :Species)
-
-
-for species in gdf
-    iter = 1
-    row = Vector()
-    for col in eachcol(species)
-        if iter == 1
-            push!(row, col[1])
-        else 
-        val = sample(col)
-        push!(row, val)
-        end
-    iter = iter + 1
-    end
-    push!(sampled_df, row)
-end
 
 function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
     #Read MI files from start_dir
     Files = readdir(start_dir)
     try
-        #mkdir(end_dir)
+        mkdir(end_dir)
     catch
         return println("Invalid Return Directory")
     end
 
     for file in Files
         println(file)
+        file_time = time()
         data = CSV.read(string(start_dir, file), DataFrame)
         # Remove the "Individual" factor as this is functionally useless in this sampling regime
         data = select!(data, Not([:Individual]))
@@ -184,6 +78,7 @@ function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
 
    
         for i in 1:init_samples
+            sample_time = time()
             sampled_df = DataFrame()
             for title in titles
                 if "NA" ∈ data[!, title]
@@ -216,6 +111,7 @@ function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
         # We should now have a data frame that has a sample per species from every variable
 
             for trait in names(sampled_df)
+                trait_time = time()
                 if trait == "Species"
                     continue
                 else
@@ -243,17 +139,23 @@ function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
                     filename = string(end_dir, trait, "_MISample", i, ".csv")
                     CSV.write(filename, trait_data)   
 
-                end               
+                end
+                elapsed_trait = time() - trait_time
+                println("Time for trait ", trait, ": ", elapsed_trait, " seconds")
             end
+            elapsed_sample = time()-sample_time
+            println("Time for sample ", i, ": ", elapsed_sample, " seconds")
         end
+        elapsed_file = time() - file_time
+        println("Time for file - ", file, ": ", elapsed_time, " seconds")
     end
 end
 
 
 
 dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
-enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_Results_211024/"
+enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_Results_221024/"
 
-Phy_Bridge_Sim(dir, enddir, mars_tree, 5, 5)
+Phy_Bridge_Sim(dir, enddir, mars_tree, 25, 25)
 
 

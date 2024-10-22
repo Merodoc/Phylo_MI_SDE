@@ -124,16 +124,6 @@ return data
 end
 
 
-pruned = Leaf_Prune(mars_tree, start_vals)
-plot(mars_tree, showtips = false, marker_z = plot_dict, linewidth = 5, markersize = 15)
-
-
-plot_dict = Dict()
-
-for i in eachrow(pruned)
-    push!(plot_dict, i[1] => i[2])
-end
-
 
 function Leaf_Prune2(tree, df, variable, species = "Species", dt = 0.01, samples = 100)
     #Currently this iterates through all the nodes in the tree from leaves to root and returns the list
@@ -166,7 +156,7 @@ data[!,:BridgeMean] .= 0.
 data[!, :BridgeVar] .= 0.
 iter = 0
 idx = 0
-vals = start_vals
+#vals = start_vals
 leaves = getleafnames(mars_tree)
 for leaf in leaves
     idx = idx + 1
