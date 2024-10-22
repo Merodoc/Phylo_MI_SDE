@@ -147,7 +147,7 @@ function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
             println("Time for sample ", i, ": ", elapsed_sample, " seconds")
         end
         elapsed_file = time() - file_time
-        println("Time for file - ", file, ": ", elapsed_time, " seconds")
+        println("Time for file - ", file, ": ", elapsed_file, " seconds")
     end
 end
 
