@@ -62,9 +62,9 @@ function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
     catch
         return println("Invalid Return Directory")
     end
-
+    file_number = 0
     for file in Files
-        println(file)
+        file_number = file_number + 1
         file_time = time()
         data = CSV.read(string(start_dir, file), DataFrame)
         # Remove the "Individual" factor as this is functionally useless in this sampling regime
@@ -109,34 +109,30 @@ function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
                 push!(sampled_df, row)
             end
         # We should now have a data frame that has a sample per species from every variable
+            trait_data = DataFrame()
 
             for trait in names(sampled_df)
                 trait_time = time()
                 if trait == "Species"
                     continue
                 else
-                    trait_data = DataFrame()
-                    for j in 1:max_iter
-                                       
+                    for j in 1:max_iter              
                         results = Leaf_Prune2(mars_tree, sampled_df, trait)
                         if j == 1
-                            species = results[!, :Species]
-                            trait_data[!, :Species] = species
+                            trait_data[!, :Species] = results[!, :Species]
                         end
-                        title = string("Iter", j)
-                        #filename = string(end_dir, title, "sample", i, ".csv")
-                        #CSV.write(filename, results)
-                        trait_vals = results[!, :Variable]
-                        trait_data[!, title] = trait_vals
+                        raw_data = select(results, Not([:Species]))
+                        title = string(i,j)
+                        trait_data[!, title] = results[!, :Variable]
                     end
                 end
                 trait_split = split(trait, ".")
                 if length(trait_split) == 2
                     trait_name = string(trait_split[1], trait_split[2])
-                    filename = string(end_dir, trait_name, "_MISample", i, ".csv")
+                    filename = string(end_dir, trait_name, "_MI", file_number, "_Sample", i, ".csv")
                     CSV.write(filename, trait_data) 
                 else
-                    filename = string(end_dir, trait, "_MISample", i, ".csv")
+                    filename = string(end_dir, trait, "_MI", file_number, "_Sample", i, ".csv")
                     CSV.write(filename, trait_data)   
 
                 end
@@ -154,7 +150,7 @@ end
 
 
 dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
-enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_Results_221024/"
+enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_231024/"
 
 Phy_Bridge_Sim(dir, enddir, mars_tree, 25, 25)
 
