@@ -216,7 +216,7 @@ Species_List = marsimp3$Species
 marsimp3$Species <- sapply(marsimp3$Species, unclass)
 
 imp4 <- mice(marsimp3, m = 25, maxit = 25, predictorMatrix = predM1, method = impM1)
-imp3 <- mice(marsimp3, m = 25, maxit=25, print = FALSE, seed = 123)
+#imp3 <- mice(marsimp3, m = 25, maxit=25, print = FALSE, seed = 123)
 
 stripplot(imp3, dentary ~.imp)
 plot(imp4)

@@ -58,7 +58,7 @@ function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
     #Read MI files from start_dir
     Files = readdir(start_dir)
     try
-        #mkdir(end_dir)
+        mkdir(end_dir)
     catch
         return println("Invalid Return Directory")
     end
@@ -149,10 +149,10 @@ end
 
 
 
-dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data2lonly/"
-enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_231024/"
+dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data2lonlyshort/"
+enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
 
-Phy_Bridge_Sim(dir, enddir, mars_tree, 1, 1)
+Phy_Bridge_Sim(dir, enddir, mars_tree, 10, 25)
 
 Files = readdir(dir)
 

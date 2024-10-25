@@ -1,45 +1,4 @@
 
-dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_Results_211024/"
-
-Files = readdir(dir)
-
-
-traits = Vector{String}()
-for file in Files
-    trait = split(file, "_")[1]
-    if trait ∉ traits
-        push!(traits, trait)
-    end
-end
-
-
-
-traits
-
-df_dict = Dict{String, DataFrame}()
-# Collates all the simulated data for each trait, can do stuff to the data frames in the dictionary
-for i in traits 
-    file_idx = findall(x -> i == split(x, "_")[1], Files)
-    trait_data = DataFrame()
-    iter = 1
-    for j in file_idx
-        data = CSV.read(string(dir, Files[j]), DataFrame)
-        titles = names(data)
-        for k in 1:length(eachcol(data))
-            if iter == 1
-                trait_data[!, titles[k]] = eachcol(data)[k]
-            else
-                if k != 1
-                    trait_data[!, string(titles[k], j)] = eachcol(data)[k]
-                end
-            end
-            iter = iter + 1 
-        end
-
-    end
-    df_dict[i] = trait_data
-end
-
 function Phybridge_Dict(dir)
     try 
         readdir(dir)
@@ -83,7 +42,7 @@ return df_dict
 end 
 
 
-dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_231024/"
+dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
 
 Phy_data = Phybridge_Dict(dir)
 
@@ -125,7 +84,7 @@ plot(x, y)
 
 aep_femur
 
-dentary = Phy_data["femur"]
+femur = Phy_data["femur"]
 das_m = filter(:Species => ==("Dasyurus_maculatus"), femur)
 das_m = select(das_m, Not([:Species]))
 das_m = collect(eachrow(das_m)[1])
@@ -154,7 +113,7 @@ thyc_y = thyc_kde.density
 plot(dasm_x, dasm_y, title = "Density Approximation of Femur Sagittal Head Length", label = "Dasyurus maculatus")
 plot!(dasv_x, dasv_y, label = "Dasyurus viverrinus")
 plot!(thyc_x, thyc_y, label = "Thylacinus cynocephalus")
-savefig("Kernel_Density_femur")
+savefig("Kernel_Density_femur_2lonlypmm")
 
 
 U = kde(thy_c, bandwidth = 1.0)
@@ -170,31 +129,32 @@ Random.seed!(123)
 plot(mars_tree)
 
 das_parent = "'14'"
-node14 = filter(:Species => ==("'14'"), dentary)
+node14 = filter(:Species => ==("'14'"), femur)
 node14 = select(node14, Not([:Species]))
 node14 = collect(eachrow(node14)[1])
 node14_kde = kde(node14)
 
 #Extant Dasyurus - Parent
-plot(node14_kde.x, node14_kde.density)
-plot!(dasm_x, dasm_y)
-plot!(dasv_x, dasv_y)
+plot(node14_kde.x, node14_kde.density, label = "Dasyurus Ancestor", title = "Density Comparison between Child nodes and Parent")
+plot!(dasm_x, dasm_y, label = "Dasyurus maculatus")
+plot!(dasv_x, dasv_y, label = "Dasyurus viverrinus")
+savefig("dasyurusancestordensity_femur")
 
 thy_parent = "'13'"
-node13 = filter(:Species => ==(thy_parent), dentary)
+node13 = filter(:Species => ==(thy_parent), femur)
 node13 = select(node13, Not([:Species]))
 node13 = collect(eachrow(node13)[1])
 node13_kde = kde(node13)
 
-plot(node13_kde.x, node13_kde.density)
-plot!(node14_kde.x, node14_kde.density)
-plot!(thyc_x, thyc_y)
+plot(node13_kde.x, node13_kde.density, label = "Thylacine ancestor")
+plot!(node14_kde.x, node14_kde.density, label = "Dasyurus ancestor")
+plot!(thyc_x, thyc_y, label = "Thylacinus cynocephalus")
 
-
+savefig("thylacancestorfemur")
 
 root = "Node 69"
 
-root_val = filter(:Species => ==(root), dentary)
+root_val = filter(:Species => ==(root), femur)
 root_val = select(root_val, Not([:Species]))
 root_val = collect(eachrow(root_val)[1])
 root_kde = kde(root_val)
@@ -209,16 +169,16 @@ species_list = Vector{String}()
 std_list = Vector{Float64}()
 means = Vector{Float64}()
 p = plot()
-for species in getnodenames(mars_tree)
+for species in reverse(getnodenames(mars_tree))
     println(species)
     std_dict2 = Dict{String, Float64}()
-    row = filter(:Species => ==(species), dentary)
+    row = filter(:Species => ==(species), femur)
     vals = select(row, Not([:Species]))
     vals = collect(eachrow(vals)[1])
     x = std(vals)
     xhat = mean(vals)
     xhat = round(xhat, digits = 3)
-    std_dict[species] = x
+    std_dict[species] = x/xhat
     mean_dict[species] = xhat
     push!(species_list, species)
     push!(means, xhat)
@@ -230,21 +190,67 @@ end
 
 display(p)
 
-plot(mars_tree, showtips = false, size = (800, 600), linewidth = 5, line_z = std_dict, series_annotations = text.mean_dict)
 
 std_dict["Node 69"]
 mean_dict["Node 69"]
 
 savefig("Tree_Femur_STDev")
 
-plot(mars_tree, showtips = false, size = (800, 600), linewidth = 2, marker_z = reverse(means), markersize = reverse(20*std_list))
+plot(mars_tree, title = "Mean sampled femur trochantericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = 35*std_list, linecolor = :purple)
+savefig("2lonlyFemur_TreeMeansbyvar")
+plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 5, line_z = std_dict)
 
-savefig("Tree_Dentary_Means_byvar2")
+savefig("Tree_femur_sdev_2lonly")
+
+
+plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = means.*std_list)
 
 species_list
 
-getnodenames(mars_tree)
+std_dict
 
-test = Phybridge_Dict(dir)
+function Phylo_Bridge_Plot(start, final, dt, t, n)
+    bridge_data = DataFrame()
+    for i in 1:n
+        startval = sample(start)
+        finalval = sample(final)
+        B = sample(0:dt:t, WienerBridge(t, finalval), startval)
+        bridge_data[!, string(i)] = Vector(B.yy)
+    end
+    return(bridge_data)
+end
 
-test["MarsMI"]
+test = Phylo_Bridge_Plot(das_v, das_m, 0.01, 12.52, 50)
+
+np = length(eachrow(test)[1])
+p = plot(np, title = "Bridge Density between D.maculatus and D.viverrinus", xlabel = "Tree Depth", ylabel = "Femur Trochantericfossa Length", legend = false)
+iter = 1
+maxy = 0
+miny = 50
+for i in 1:np
+    y = collect(eachcol(test)[i])
+    #println(y)
+    #println(y)
+    x = 0:0.01:12.52
+    plot!(x, y, marker_z = (6.26, y[626]), marker_size = 10)
+end
+x = [6.26, 6.26]
+y = [5, 22]
+plot!(x, y, label = "Predicted Ancestor Time", linewidth = 5, linecolor = :red)
+display(p)
+
+savefig("BridgeFigure")
+
+for i in getleaves(mars_tree)                                                                                       
+    name = i.name                                                                                                       
+    name = split(name, "_")                                                                                             
+    name = string(name[1][1], ".", name[2])                                                                             
+    
+    i.name = name
+end
+
+
+y = collect(eachcol(test)[1])
+x = 0:0.01:12.52
+plot(x, y)
+y = collect(eachcol(test)[2])

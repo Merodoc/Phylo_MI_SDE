@@ -86,57 +86,42 @@ test = WienerAnim2(10, 0.1, 50)
 
 gif(test)
 
-function WienerAnim3(t, dt, n)
-    Y = Vector{Vector{Float64}}()
-    Y2 = Vector{Vector{Float64}}()
-    T2 = Vector{Vector{Float64}}()
-    T = Vector{Vector{Float64}}()
-    p = plot(2*n, legend=false)
-    xlims!(0,t)
-    ylims!(-10,10)
-    for i in 1:n
-        W = sample(0:dt:t, Wiener())
-        W2 = sample(0:dt:t, Wiener())
-        Wyforward = W.yy
-        Wybackward = reverse(W.tt)
-        #Have to do a lot to fix this, as the y values are going same direction
-        #need to account for the reverse of the time, not reverse of the value
-        #Otherwise should be manageable 
-        for i in 1:length(W.yy)
-            if W.yy[i] > reverse(W2.yy[i])-0.5 && W.yy[i] < reverse(W2.yy)[i] + 0.5
-                println("Bridge Match")
-                println(W.tt[i])
-                println(W.yy[i])
-                println(reverse(W2.tt)[i])
-                println(W2.yy[i])
-                return println("Test")
-                newW2 = W2.yy[1:length(W.yy)-i]
-
-                for j in i:length(W.yy)
-                    push!(newW2, W.yy[j])
-                end
-
-                break
-            end
+function Phylo_Bridge_anim(start, fin, fin_time, anc, dt, samples)
+    #start = start value
+    #fin = final value
+    #fin_time = total time
+    #anc = time point of the ancestor node
+    #samples = number of repeats
+    N = 1:samples
+    Xhat = Vector{Float64}()
+    paths = DataFrame()
+    for n in N
+        B = sample(0:dt:fin_time, WienerBridge(fin_time,fin), start)
+        idx = findall(x -> x == anc, B.tt)
+        val = B.yy[idx][1]
+        paths[!, string(n)] = Vector(B.yy)
         end
 
-        push!(Y, W.yy)
-        push!(T, W.tt)
-        try
-        push!(Y2, newW2)
-        catch
-            push!(Y2, W2.yy)
-        end
-        push!(T2, reverse(W2.tt))
-    end
-    anim = @animate for x = 1:length(T[1])
-        for i in 1:n
-            push!(p, i, T[i][x], Y[i][x])
-            push!(p, (2*n+1)-i, T2[i][x], Y2[i][x])
-        end
-    end
-return anim
+return paths
 end
-    
-test = WienerAnim3(10, 0.1, 50)
-gif(test)
+
+bridgeanim = Phylo_Bridge_anim(11.24, 29.5, 12.52, 6.26, 0.01, 10)
+
+t = 0:0.01:12.52
+p = plot(200, legend = false)
+xlims!(0, 12.52)
+ylims!(0, 30)
+anim = @animate for x = 1:626
+    for i in 1:10
+        y = collect(eachcol(bridgeanim)[i])
+        if x == 626
+            push!(p, i, t[x], y[x], marker_z = y[x])
+        end
+        push!(p, i, t[x], y[x])
+        push!(p, 201-i, reverse(t)[x], reverse(y)[x])
+    end
+end
+
+gif(anim)
+
+
