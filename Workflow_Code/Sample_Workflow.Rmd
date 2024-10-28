@@ -200,25 +200,36 @@ edf$Species <- mars_tree$tip.label
 
 marsimp3 <- merge(marsimp2, edf, by="Species")
 
-imp0 <- mice(marsimp3, maxit = 0)
+imp0 <- mice(marsimp2, maxit = 0)
 predM <- imp0$predictorMatrix
 impM <- imp0$method
+impM[c(3:25, 27:29)] <- "norm"
+
 
 traits = colnames(Marsimp)[-1]
 traits = traits[-1]
 
 predM1 <- predM
 predM1[traits, "Species"] <- as.integer(-2)
+predM1["Individual", "Species"] <- as.integer(-2)
 impM1 <- impM
 impM1["Species"] <- c("2lonly.pmm")
+#impM1[c(3:25, 27:29)] <- c("pmm")
 marsimp3$Species <- as.factor(marsimp3$Species)
 Species_List = marsimp3$Species
-marsimp3$Species <- sapply(marsimp3$Species, unclass)
+marsimp2$Species <- sapply(marsimp3$Species, unclass)
 
-imp4 <- mice(marsimp3, m = 25, maxit = 25, predictorMatrix = predM1, method = impM1)
+
+```
+
+```{R}
+
+impnopvr <- mice(marsimp2, maxit = 20)
+impnorm <- mice(marsimp3, maxit = 20, predictorMatrix =  predM, method = impM)
+imp4 <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = impM1)
 #imp3 <- mice(marsimp3, m = 25, maxit=25, print = FALSE, seed = 123)
-
-stripplot(imp3, dentary ~.imp)
+densityplot(imp4, ~femur)
+stripplot(imp4, dentary ~.imp)
 plot(imp4)
 # Extract complete imputed data
 
@@ -230,6 +241,9 @@ Filename = "MI_Data2lonly/MarsMI_Imp"
 iter = 0
 variables = colnames(Marsimp)
 
+```
+
+```{R}
 for (i in newdata) {
   current = i
   current$Species = Species_List
