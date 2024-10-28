@@ -1,3 +1,6 @@
+using DataFrames
+using Phylo
+using CSV
 
 function Phybridge_Dict(dir)
     try 
@@ -42,7 +45,8 @@ return df_dict
 end 
 
 
-dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
+#dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Sampled2l_241024"
 
 Phy_data = Phybridge_Dict(dir)
 
@@ -182,9 +186,6 @@ for species in reverse(getnodenames(mars_tree))
     mean_dict[species] = xhat
     push!(species_list, species)
     push!(means, xhat)
-    if x < 1
-        x = 1
-    end
     push!(std_list, round(x/xhat, digits = 2))
 end
 
