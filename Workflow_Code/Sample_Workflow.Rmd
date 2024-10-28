@@ -191,7 +191,7 @@ marsimp2$Species = as.factor(marsimp2$Species)
 marsimp2
 library("PVR")
 library("plyr")
-X <- PVRdecomp(mars_tree, scale = TRUE)
+X <- PVRdecomp(mars_tree, scale = FALSE)
 
 evec <- X@Eigen$vectors
 
@@ -213,20 +213,61 @@ predM1 <- predM
 predM1[traits, "Species"] <- as.integer(-2)
 predM1["Individual", "Species"] <- as.integer(-2)
 impM1 <- impM
-impM1["Species"] <- c("2lonly.pmm")
-#impM1[c(3:25, 27:29)] <- c("pmm")
+impM1["Species"] <- c("2lonly.norm")
+impM1[c(3:25, 27:29)] <- c("2l.norm")
+marsimp2$Species <- as.factor(marsimp2$Species)
+Species_List = marsimp3$Species
+marsimp2$Species <- sapply(marsimp2$Species, unclass)
+
+predM4 <- predM1
+impM4 <- impM1
+impM4["Species"] <- c("2lonly.pmm")
+impM4[c(3:25, 27:29)] <- c("2l.pmm")
+
+impM5 <- impM1
+impM5["Species"] <- c("2lonly.pmm")
+impM5[c(3:25, 27:29)] <- c("2l.pan")
+
+
+impM3 <- impM
+impM3[c(3:25, 27:29)] <- c("norm")
+
+imp1 <- mice(marsimp3, maxit = 0)
+predMpvr <- imp1$predictorMatrix
+impMpvr <- imp1$method
+impMpvr[c(3:25, 27:29)] <- "norm"
+
+
+traits = colnames(Marsimp)[-1]
+traits = traits[-1]
+
+predM2 <- predMpvr
+predM2[traits, "Species"] <- as.integer(-2)
+predM2["Species", c(3:25, 27:29, 31:62)] <- as.integer(-2)
+predM2["Individual", "Species"] <- as.integer(-2)
+impM2 <- impMpvr
+impM2["Species"] <- c("2lonly.pmm")
+impM2[c(3:25, 27:29)] <- c("2l.pan")
+impM2[c(31:62)] <- c("")
 marsimp3$Species <- as.factor(marsimp3$Species)
 Species_List = marsimp3$Species
-marsimp2$Species <- sapply(marsimp3$Species, unclass)
-
+marsimp3$Species <- sapply(marsimp3$Species, unclass)
+marsimp3$Species <- as.integer(marsimp3$Species)
 
 ```
 
 ```{R}
 
-impnopvr <- mice(marsimp2, maxit = 20)
-impnorm <- mice(marsimp3, maxit = 20, predictorMatrix =  predM, method = impM)
+impcart <- mice(marsimp3, maxit = 20, method = "cart")
+impmidas <- mice(marsimp2, maxit = 20, method = "midastouch")
+impnorm <- mice(marsimp3, maxit = 20, predictorMatrix =  predM, method = impM3)
 imp4 <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = impM1)
+
+library("miceadds")
+impnopvr <- mice(marsimp2, maxit = 5, predictorMatrix = predM1, method = impM1)
+impnopvrpmm <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = impM4)
+
+imppvr2 <- mice(marsimp3, m = 5, maxit = 20, predictorMatrix = predM2, method = impM2)
 #imp3 <- mice(marsimp3, m = 25, maxit=25, print = FALSE, seed = 123)
 densityplot(imp4, ~femur)
 stripplot(imp4, dentary ~.imp)
@@ -244,6 +285,22 @@ variables = colnames(Marsimp)
 ```
 
 ```{R}
+
+impcart <- mice(marsimp3, maxit = 20, method = "cart")
+impmmpvr <- mice(marsimp3, maxit = 20, predictorMatrix = predM2)
+
+
+impmidas <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = "midastouch")
+impnopvr <- mice(marsimp2, maxit = 5, predictorMatrix = predM1, method = impM1)
+impnopvrpmm <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = impM4)
+impnopvrpmm <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = impM5)
+
+
+
+
+
+
+
 for (i in newdata) {
   current = i
   current$Species = Species_List
