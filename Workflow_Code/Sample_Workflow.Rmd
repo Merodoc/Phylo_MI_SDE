@@ -185,7 +185,7 @@ Now we need to Figure out how to get the phylogeny to influence our Missing Data
 
 ```{r}
 missingfromtree2 = which(!(Marsimp$Species %in% mars_tree$tip.label))
-
+marsimp = Marsimp[-missingfromtree2, ]
 marsimp2 = Marsimp[-missingfromtree2,]
 marsimp2$Species = as.factor(marsimp2$Species)
 marsimp2
@@ -286,32 +286,122 @@ variables = colnames(Marsimp)
 
 ```{R}
 
-impcart <- mice(marsimp3, maxit = 20, method = "cart")
-impmmpvr <- mice(marsimp3, maxit = 20, predictorMatrix = predM2)
+impcart <- mice(marsimp3, m = 25, maxit = 20, method = "cart")
+imppmmpvr <- mice(marsimp3, m = 25, maxit = 20, predictorMatrix = predM2)
+
+imppmm1lnopvr <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1)
+impmidas <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = "midastouch")
+impnopvr <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = impM1)
+impnopvrpan <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = impM4)
+impnopvrpmm <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = impM5)
 
 
-impmidas <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = "midastouch")
-impnopvr <- mice(marsimp2, maxit = 5, predictorMatrix = predM1, method = impM1)
-impnopvrpmm <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = impM4)
-impnopvrpmm <- mice(marsimp2, maxit = 20, predictorMatrix = predM1, method = impM5)
+impcart.dat <- complete(impcart, action = "long")
+
+newdata = split(impcart.dat, f = impcart.dat$.imp)
+Output = data.frame(Species = sort(edf$Species))
+Filename = "Data/MI_Cart/MI_Imp"
+variables = colnames(Marsimp)
 
 
-
-
-
-
+iter = 1
 
 for (i in newdata) {
   current = i
   current$Species = Species_List
   var_idx = which(colnames(i) %in% variables)
-  iter = iter + 1
   Output = current[,var_idx]
   newfile = paste(Filename, iter, sep = "_")
   newfile = paste(newfile, "csv", sep = ".")
   write.csv(Output, newfile, row.names = FALSE)
+  iter = iter + 1
 }
 
+imppmmpvr.dat <- complete(imppmmpvr, action = "long")
+
+newdata = split(imppmmpvr.dat, f = imppmmpvr.dat$.imp)
+Output = data.frame(Species = sort(edf$Species))
+Filename = "Data/MI_PMMPVR/MI_Imp"
+
+iter = 1
+
+for (i in newdata) {
+  current = i
+  current$Species = Species_List
+  var_idx = which(colnames(i) %in% variables)
+  Output = current[,var_idx]
+  newfile = paste(Filename, iter, sep = "_")
+  newfile = paste(newfile, "csv", sep = ".")
+  write.csv(Output, newfile, row.names = FALSE)
+  iter = iter + 1
+}
+
+imppmm1lnopvr.dat <- complete(imppmm1lnopvr, action = "long")
+
+newdata = split(imppmm1lnopvr.dat, f = imppmm1lnopvr.dat$.imp)
+Output = data.frame(Species = sort(edf$Species))
+Filename = "Data/MI_1lPMMnoPVR/MI_Imp"
+variables = colnames(Marsimp)
+
+
+iter = 1
+
+for (i in newdata) {
+  current = i
+  current$Species = Species_List
+  var_idx = which(colnames(i) %in% variables)
+  Output = current[,var_idx]
+  newfile = paste(Filename, iter, sep = "_")
+  newfile = paste(newfile, "csv", sep = ".")
+  write.csv(Output, newfile, row.names = FALSE)
+  iter = iter + 1
+}
+
+
+
+impmidas.dat <- complete(impmidas, action = "long")
+
+newdata = split(impmidas.dat, f = impmidas.dat$.imp)
+Output = data.frame(Species = sort(edf$Species))
+Filename = "Data/MI_Midas/MI_Imp"
+variables = colnames(Marsimp)
+
+
+iter = 1
+
+for (i in newdata) {
+  current = i
+  current$Species = Species_List
+  var_idx = which(colnames(i) %in% variables)
+  Output = current[,var_idx]
+  newfile = paste(Filename, iter, sep = "_")
+  newfile = paste(newfile, "csv", sep = ".")
+  write.csv(Output, newfile, row.names = FALSE)
+  iter = iter + 1
+}
+
+
+
+impmidas.dat <- complete(impmidas, action = "long")
+
+newdata = split(impmidas.dat, f = impmidas.dat$.imp)
+Output = data.frame(Species = sort(edf$Species))
+Filename = "Data/MI_Midas/MI_Imp"
+variables = colnames(Marsimp)
+
+
+iter = 1
+
+for (i in newdata) {
+  current = i
+  current$Species = Species_List
+  var_idx = which(colnames(i) %in% variables)
+  Output = current[,var_idx]
+  newfile = paste(Filename, iter, sep = "_")
+  newfile = paste(newfile, "csv", sep = ".")
+  write.csv(Output, newfile, row.names = FALSE)
+  iter = iter + 1
+}
 
 ```
 
