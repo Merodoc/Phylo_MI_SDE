@@ -50,8 +50,8 @@ function PhyMIR_Analyze_dir(start_dir, end_dir, tree)
     
 end
 
-dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
-enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_Results_1/"
+dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/"
+enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_Results_/"
 
 
 function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
@@ -149,61 +149,16 @@ end
 
 
 
-dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data2lonlyshort/"
-enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
-
-Phy_Bridge_Sim(dir, enddir, mars_tree, 10, 25)
-
+dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Data/"
+enddir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled_041124_"
 Files = readdir(dir)
 
-df_dict = Dict{String, DataFrame}()
-
-data = CSV.read(string(dir, Files[1]), DataFrame)
-select(data, [:Species, :humerus])
+for file in Files 
+    newdir = string(dir, file, "/")
+    findir = string(enddir, file)
+    Phy_Bridge_Sim(newdir, findir, mars_tree, 25, 25)
+end
 
  
-dir2 = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
-Files2 = readdir(dir2)
-data2 = CSV.read(string(dir2, Files2[7]), DataFrame)
 
-species = Vector{String}()
-for i in eachcol(data2)[1]
-    if i ∉ species
-        push!(species, i)
-    end
-end
-
-species
-
-traitdf = select(data, Not([:Species, :Individual]))
-traits = names(traitdf)
-mi_dict = Dict{String, DataFrame}()
-
-species_dict = Dict()
-for i in 1:length(species)
-    species_dict[i] = species[i]
-end
-
-for trait in traits 
-    trait_data = DataFrame()
-    trait_vec = Vector{Float64}()
-    iter = 1
-    for file in Files 
-        data = CSV.read(string(dir, file), DataFrame)
-        if iter == 1
-            specnumbers = data[!, :Species]
-            spec_vec = Vector()
-            for i in 1:length(eachcol(data)[1])
-                idx = data[i, :Species]
-                push!(spec_vec, species_dict[idx])
-            end
-            trait_data[!, :Species] = spec_vec
-        end
-        data = select(data, trait)
-        data = collect(eachcol(data)[1])
-        trait_data[!, file] = data
-        iter = iter + 1
-    end
-    mi_dict[trait] = trait_data
-end
 
