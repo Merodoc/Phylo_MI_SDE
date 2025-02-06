@@ -79,7 +79,7 @@ aep_femur = collect(eachrow(aep_femur)[1])
 
 aep_femur_kde = kde(aep_femur)
 
-using Plots
+using PlotlyJS
 
 x = aep_femur_kde.x
 y = aep_femur_kde.density
@@ -117,7 +117,7 @@ thyc_y = thyc_kde.density
 plot(dasm_x, dasm_y, title = "Density Approximation of Femur Sagittal Head Length", label = "Dasyurus maculatus")
 plot!(dasv_x, dasv_y, label = "Dasyurus viverrinus")
 plot!(thyc_x, thyc_y, label = "Thylacinus cynocephalus")
-savefig("Kernel_Density_femur_2lonlypmm")
+savefig("Kernel_Density_femur_1LPMMnoPVR")
 
 
 U = kde(thy_c, bandwidth = 1.0)
@@ -142,7 +142,7 @@ node14_kde = kde(node14)
 plot(node14_kde.x, node14_kde.density, label = "Dasyurus Ancestor", title = "Density Comparison between Child nodes and Parent")
 plot!(dasm_x, dasm_y, label = "Dasyurus maculatus")
 plot!(dasv_x, dasv_y, label = "Dasyurus viverrinus")
-savefig("dasyurusancestordensity_femur")
+savefig("dasyurusancestordensity_femur1LPMMnoPVR")
 
 thy_parent = "'13'"
 node13 = filter(:Species => ==(thy_parent), femur)
@@ -154,7 +154,7 @@ plot(node13_kde.x, node13_kde.density, label = "Thylacine ancestor")
 plot!(node14_kde.x, node14_kde.density, label = "Dasyurus ancestor")
 plot!(thyc_x, thyc_y, label = "Thylacinus cynocephalus")
 
-savefig("thylacancestorfemur")
+savefig("thylacancestorfemur1LPMMnoPVR")
 
 root = "Node 69"
 
@@ -198,10 +198,10 @@ mean_dict["Node 69"]
 savefig("Tree_Femur_STDev")
 
 plot(mars_tree, title = "Mean sampled femur trochantericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = 35*std_list, linecolor = :purple)
-savefig("2lonlyFemur_TreeMeansbyvar")
+savefig("1LPMMnoPVR_TreeMeansbyvar")
 plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 5, line_z = std_dict)
 
-savefig("Tree_femur_sdev_2lonly")
+savefig("Tree_femur_sdev_1LPMMnoPVR")
 
 
 plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = means.*std_list)
@@ -241,15 +241,9 @@ y = [5, 22]
 plot!(x, y, label = "Predicted Ancestor Time", linewidth = 5, linecolor = :red)
 display(p)
 
-savefig("BridgeFigure")
+savefig("BridgeFigure1LPMMnoPVR")
 
-for i in getleaves(mars_tree)                                                                                       
-    name = i.name                                                                                                       
-    name = split(name, "_")                                                                                             
-    name = string(name[1][1], ".", name[2])                                                                             
-    
-    i.name = name
-end
+
 
 
 y = collect(eachcol(test)[1])
@@ -258,74 +252,49 @@ plot(x, y)
 y = collect(eachcol(test)[2])
 
 
-MI_Dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/MI_Data2lonly/"
-MIdict = Phybridge_Dict(MI_Dir)
+using PlotlyJS
 
-MIdata = MIdict["MarsMI"]
+df = dataset(DataFrame, "tips")
 
-MIdata.femur1
+PlotlyJS.plot(df, y=:total_bill, kind = "box")
+
+femur
 
 
-function Phybridge_MIDict(dir)
-    try 
-        readdir(dir)
-    catch
-        println("Invalid directory")
-    end
-    Files = readdir(dir)
 
-    traitsource = CSV.read(string(dir, Files[1]), DataFrame)
-    traits = names(select(traitsource, Not([:Species, :Individual])))
+femur = select(permutedims(femur, 1), Not([:Species]))
+p1 = PlotlyJS.plot(femur, y=:Thylacinus_cynocephalus, kind = "box")
+p2 = PlotlyJS.plot(femur, y=:Dasyurus_maculatus, kind = "box")
 
-    df_dict = Dict{String, DataFrame}()
-# Collates all the simulated data for each trait, can do stuff to the data frames in the dictionary
-for i in traits 
-    #file_idx = findall(x -> i == split(x, "_")[1], Files)
-    trait_data = DataFrame()
-    iter = 1
-    for file in Files
-        data = CSV.read(string(dir, file), DataFrame)
-        if iter == 1
-            trait_data[!, :Species] = data[!, 1]
-        end
-        iter = iter + 1
-        trait_data[!, file] = data[!, i]
-    end
-    df_dict[i] = trait_data
-end
-return df_dict
-end 
+p = [p1 p2]
 
-MI_dict = Phybridge_MIDict(MI_Dir)
+p1 = PlotlyJS.plot(femur, y=:Thylacinus_cynocephalus, kind = "scatter")
 
-MI_femur = MI_dict["femur"]
+x = das_m
+y = das_v
 
-length(names(MI_femur))
-p = plot(legend = false)
-for i in 2:length(names(MI_femur))
-    vals = collect(eachcol(MI_femur)[i])
-    U = kde(vals)
-    plot!(U.x, U.density)
-end
+PlotlyJS.plot(histogram2dcontour(x=x,y=y))
 
-display(p)
+PlotlyJS.plot(femur, x=:Dasyurus_viverrinus, y=:Dasyurus_maculatus, xbingroup = "x", ybingroup = "y", kind ="histogram2d")
 
-osp = filter(:Species => ==("Osphranter_robustus"), femur)
-osp = select(osp, Not([:Species]))
-osp = collect(eachrow(osp)[1])
+std(das_m)
 
-U = kde(osp)
+getnodedata(mars_tree, "Node 69")
 
-plot!(U.x, U.density, linewidth = 5, linecolor = :red)
+newdf = mapcols(col -> std(col), femur)
+names(femur)
 
-osp = filter(:Species => ==("Onychogalea_unguifera"), femur)
-osp = select(osp, Not([:Species]))
-osp = collect(eachrow(osp)[1])
+newdf2 = DataFrame(Species = names(femur))
+newdf2[:, :Mean] = collect(mapcols(col -> mean(col), femur)[1,:])
+newdf2
+newdf2[:, :Stdev] = collect(mapcols(col -> std(col), femur)[1,:])
 
-U = kde(osp)
+heights = nodeheights(mars_tree)
 
-plot(U.x, U.density, linewidth = 5, linecolor = :blue)
-savefig("Onychogalea_femur")
+heightdf = DataFrame(Species = heights.axes[1][:], Depth = collect(heights))
 
-std(osp)
+test_df = innerjoin(heightdf, newdf2, on = :Species)
+using PlotlyJS
 
+PlotlyJS.plot(scatter(test_df, x=:Depth, y=:Mean, mode = "markers"))
+using Pkg
