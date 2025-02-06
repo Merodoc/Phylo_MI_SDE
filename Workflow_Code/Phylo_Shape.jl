@@ -46,7 +46,7 @@ end
 
 
 #dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Sampled2l_241024/"
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/MI_1lPMMnoPVR_121124/"
 
 Phy_data = Phybridge_Dict(dir)
 
@@ -210,6 +210,7 @@ species_list
 
 std_dict
 
+using Bridge
 function Phylo_Bridge_Plot(start, final, dt, t, n)
     bridge_data = DataFrame()
     for i in 1:n
@@ -324,5 +325,7 @@ osp = collect(eachrow(osp)[1])
 U = kde(osp)
 
 plot(U.x, U.density, linewidth = 5, linecolor = :blue)
+savefig("Onychogalea_femur")
 
 std(osp)
+

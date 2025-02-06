@@ -291,10 +291,11 @@ imppmmpvr <- mice(marsimp3, m = 25, maxit = 20, predictorMatrix = predM2)
 
 imppmm1lnopvr <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1)
 impmidas <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = "midastouch")
-impnopvr <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = impM1)
-impnopvrpan <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = impM4)
-impnopvrpmm <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = impM5)
+impnopvrpmm <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = impM4)
+impnopvrpan <- mice(marsimp2, m = 25, maxit = 20, predictorMatrix = predM1, method = impM5)
+```
 
+```{R}
 
 impcart.dat <- complete(impcart, action = "long")
 
@@ -387,6 +388,52 @@ impmidas.dat <- complete(impmidas, action = "long")
 newdata = split(impmidas.dat, f = impmidas.dat$.imp)
 Output = data.frame(Species = sort(edf$Species))
 Filename = "Data/MI_Midas/MI_Imp"
+variables = colnames(Marsimp)
+
+
+iter = 1
+
+for (i in newdata) {
+  current = i
+  current$Species = Species_List
+  var_idx = which(colnames(i) %in% variables)
+  Output = current[,var_idx]
+  newfile = paste(Filename, iter, sep = "_")
+  newfile = paste(newfile, "csv", sep = ".")
+  write.csv(Output, newfile, row.names = FALSE)
+  iter = iter + 1
+}
+
+
+
+impnopvrpmm.dat <- complete(impnopvrpmm, action = "long")
+
+newdata = split(impnopvrpmm.dat, f = impnopvrpmm.dat$.imp)
+Output = data.frame(Species = sort(edf$Species))
+Filename = "Data/MI_impnopvrpmm/MI_Imp"
+variables = colnames(Marsimp)
+
+
+iter = 1
+
+for (i in newdata) {
+  current = i
+  current$Species = Species_List
+  var_idx = which(colnames(i) %in% variables)
+  Output = current[,var_idx]
+  newfile = paste(Filename, iter, sep = "_")
+  newfile = paste(newfile, "csv", sep = ".")
+  write.csv(Output, newfile, row.names = FALSE)
+  iter = iter + 1
+}
+
+
+
+impnopvrpan.dat <- complete(impnopvrpan, action = "long")
+
+newdata = split(impnopvrpan.dat, f = impnopvrpan.dat$.imp)
+Output = data.frame(Species = sort(edf$Species))
+Filename = "Data/MI_impnopvrpan/MI_Imp"
 variables = colnames(Marsimp)
 
 
