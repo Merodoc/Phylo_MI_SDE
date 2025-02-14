@@ -1,6 +1,7 @@
 using DataFrames
 using Phylo
 using CSV
+using Plots
 
 function Phybridge_Dict(dir)
     try 
@@ -80,11 +81,11 @@ aep_femur = collect(eachrow(aep_femur)[1])
 aep_femur_kde = kde(aep_femur)
 
 using PlotlyJS
-
+using Plots
 x = aep_femur_kde.x
 y = aep_femur_kde.density
 
-plot(x, y)
+Plots.plot(x, y)
 
 aep_femur
 
@@ -96,7 +97,7 @@ dasm_kde = kde(das_m)
 dasm_x = dasm_kde.x 
 dasm_y = dasm_kde.density
 
-plot(dasm_x, dasm_y)
+Plots.plot(dasm_x, dasm_y)
 
 das_v = filter(:Species => ==("Dasyurus_viverrinus"), femur)
 das_v = select(das_v, Not([:Species]))
@@ -105,7 +106,7 @@ dasv_kde = kde(das_v)
 dasv_x = dasv_kde.x 
 dasv_y = dasv_kde.density
 
-plot!(dasv_x, dasv_y)
+Plots.plot!(dasv_x, dasv_y)
 
 thy_c = filter(:Species => ==("Thylacinus_cynocephalus"), femur)
 thy_c = select(thy_c, Not([:Species]))
@@ -114,15 +115,15 @@ thyc_kde = kde(thy_c)
 thyc_x = thyc_kde.x 
 thyc_y = thyc_kde.density
 
-plot(dasm_x, dasm_y, title = "Density Approximation of Femur Sagittal Head Length", label = "Dasyurus maculatus")
-plot!(dasv_x, dasv_y, label = "Dasyurus viverrinus")
-plot!(thyc_x, thyc_y, label = "Thylacinus cynocephalus")
-savefig("Kernel_Density_femur_1LPMMnoPVR")
+Plots.plot(dasm_x, dasm_y, title = "Density Approximation of Femur Sagittal Head Length", label = "Dasyurus maculatus")
+Plots.plot!(dasv_x, dasv_y, label = "Dasyurus viverrinus")
+Plots.plot!(thyc_x, thyc_y, label = "Thylacinus cynocephalus")
+Plots.savefig("Kernel_Density_femur_1LPMMnoPVR")
 
 
 U = kde(thy_c, bandwidth = 1.0)
-plot(U.x, U.density)
-plot!(thyc_x, thyc_y)
+Plots.plot(U.x, U.density)
+Plots.plot!(thyc_x, thyc_y)
 
 using Phylo
 
@@ -130,7 +131,7 @@ mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Document
 import Random
 Random.seed!(123)
 
-plot(mars_tree)
+Plots.plot(mars_tree)
 
 das_parent = "'14'"
 node14 = filter(:Species => ==("'14'"), femur)
@@ -139,10 +140,10 @@ node14 = collect(eachrow(node14)[1])
 node14_kde = kde(node14)
 
 #Extant Dasyurus - Parent
-plot(node14_kde.x, node14_kde.density, label = "Dasyurus Ancestor", title = "Density Comparison between Child nodes and Parent")
-plot!(dasm_x, dasm_y, label = "Dasyurus maculatus")
-plot!(dasv_x, dasv_y, label = "Dasyurus viverrinus")
-savefig("dasyurusancestordensity_femur1LPMMnoPVR")
+Plots.plot(node14_kde.x, node14_kde.density, label = "Dasyurus Ancestor", title = "Density Comparison between Child nodes and Parent")
+Plots.plot!(dasm_x, dasm_y, label = "Dasyurus maculatus")
+Plots.plot!(dasv_x, dasv_y, label = "Dasyurus viverrinus")
+Plots.savefig("dasyurusancestordensity_femur1LPMMnoPVR")
 
 thy_parent = "'13'"
 node13 = filter(:Species => ==(thy_parent), femur)
@@ -150,11 +151,11 @@ node13 = select(node13, Not([:Species]))
 node13 = collect(eachrow(node13)[1])
 node13_kde = kde(node13)
 
-plot(node13_kde.x, node13_kde.density, label = "Thylacine ancestor")
-plot!(node14_kde.x, node14_kde.density, label = "Dasyurus ancestor")
-plot!(thyc_x, thyc_y, label = "Thylacinus cynocephalus")
+Plots.plot(node13_kde.x, node13_kde.density, label = "Thylacine ancestor")
+Plots.plot!(node14_kde.x, node14_kde.density, label = "Dasyurus ancestor")
+Plots.plot!(thyc_x, thyc_y, label = "Thylacinus cynocephalus")
 
-savefig("thylacancestorfemur1LPMMnoPVR")
+Plots.savefig("thylacancestorfemur1LPMMnoPVR")
 
 root = "Node 69"
 
@@ -163,7 +164,7 @@ root_val = select(root_val, Not([:Species]))
 root_val = collect(eachrow(root_val)[1])
 root_kde = kde(root_val)
 
-plot(root_kde.x, root_kde.density)
+Plots.plot(root_kde.x, root_kde.density)
 
 using Statistics
 
@@ -172,7 +173,7 @@ mean_dict = Dict{String, Float64}()
 species_list = Vector{String}()
 std_list = Vector{Float64}()
 means = Vector{Float64}()
-p = plot()
+p = Plots.plot()
 for species in reverse(getnodenames(mars_tree))
     println(species)
     std_dict2 = Dict{String, Float64}()
@@ -195,16 +196,16 @@ display(p)
 std_dict["Node 69"]
 mean_dict["Node 69"]
 
-savefig("Tree_Femur_STDev")
+Plots.savefig("Tree_Femur_STDev")
 
-plot(mars_tree, title = "Mean sampled femur trochantericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = 35*std_list, linecolor = :purple)
-savefig("1LPMMnoPVR_TreeMeansbyvar")
-plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 5, line_z = std_dict)
+Plots.plot(mars_tree, title = "Mean sampled femur trochantericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = 35*std_list, linecolor = :purple)
+Plots.savefig("1LPMMnoPVR_TreeMeansbyvar")
+Plots.plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 5, line_z = std_dict)
 
-savefig("Tree_femur_sdev_1LPMMnoPVR")
+Plots.savefig("Tree_femur_sdev_1LPMMnoPVR")
 
 
-plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = means.*std_list)
+Plots.plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = means.*std_list)
 
 species_list
 
@@ -225,7 +226,7 @@ end
 test = Phylo_Bridge_Plot(das_v, das_m, 0.01, 12.52, 50)
 
 np = length(eachrow(test)[1])
-p = plot(np, title = "Bridge Density between D.maculatus and D.viverrinus", xlabel = "Tree Depth", ylabel = "Femur Trochantericfossa Length", legend = false)
+p = Plots.plot(np, title = "Bridge Density between D.maculatus and D.viverrinus", xlabel = "Tree Depth", ylabel = "Femur Trochantericfossa Length", legend = false)
 iter = 1
 maxy = 0
 miny = 50
@@ -234,21 +235,21 @@ for i in 1:np
     #println(y)
     #println(y)
     x = 0:0.01:12.52
-    plot!(x, y, marker_z = (6.26, y[626]), marker_size = 10)
+    Plots.plot!(x, y, marker_z = (6.26, y[626]), marker_size = 10)
 end
 x = [6.26, 6.26]
 y = [5, 22]
-plot!(x, y, label = "Predicted Ancestor Time", linewidth = 5, linecolor = :red)
+Plots.plot!(x, y, label = "Predicted Ancestor Time", linewidth = 5, linecolor = :red)
 display(p)
 
-savefig("BridgeFigure1LPMMnoPVR")
+Plots.savefig("BridgeFigure1LPMMnoPVR")
 
 
 
 
 y = collect(eachcol(test)[1])
 x = 0:0.01:12.52
-plot(x, y)
+Plots.plot(x, y)
 y = collect(eachcol(test)[2])
 
 
@@ -294,7 +295,89 @@ heights = nodeheights(mars_tree)
 heightdf = DataFrame(Species = heights.axes[1][:], Depth = collect(heights))
 
 test_df = innerjoin(heightdf, newdf2, on = :Species)
-using PlotlyJS
 
-PlotlyJS.plot(scatter(test_df, x=:Depth, y=:Mean, mode = "markers"))
-using Pkg
+y = test_df[!,4]
+y2 = test_df[!,4]
+x = test_df[!,2]
+Plots.plot(x,y./y2, seriestype=:scatter)
+
+plotlyjs()
+gr()
+p = Plots.plot()
+scatter!(x, y)
+
+PlotlyJS.plot(test_df, x=:Depth, y=:Mean, xbingroup="x", ybingroup="y", kind="histogram2d")
+#Get Bounds for each node
+#Split the depths then get KDEs for the depths of the tree? 
+
+
+femur2 = Phy_data["femur"]
+
+femur_df = innerjoin(heightdf, femur2, on =:Species)
+
+gdf = groupby(femur_df, :Depth)
+
+gdf[1]
+
+root = select(gdf[1], Not([:Species, :Depth]))
+root2 = select(gdf[1], Not([:Depth]))
+rootvals = Matrix(root)
+rootvals = vec(rootvals)
+rootkde = kde(rootvals)
+
+
+#Plot of the density at leaves vs root
+x = mean.(eachrow(root))
+y = zeros(Float64, 21, 1)
+Plots.scatter(x, y, label = "Mean Leaf Value", title = "Leaf KDE compared to Root")
+Plots.plot!(rootkde.x, rootkde.density, label = "Density at Leaves")
+
+gdf[34]
+
+node = select(gdf[34], Not([:Species, :Depth]))
+nodevals = vec(Matrix(node))
+nodekde = kde(nodevals)
+
+Plots.plot!(nodekde.x, nodekde.density, label = "Density at Root")
+Plots.savefig("RootLeafKDECombined")
+Plots.scatter(x = mean.(eachrow(root)), y = zeros(Float64, 21, 1))
+maximum(nodevals)
+minimum(nodevals)
+
+root2
+root2 = select(gdf[1], Not([:Depth]))
+root2 = select(permutedims(root2, 1), Not([:Species]))
+
+
+p = Plots.plot(nodekde.x, nodekde.density, label = "Root", linewidth = 4, xlimits = (0, 50), size = (600,800), title = "Root density compared to Leaves")
+
+for i in 1:length(eachcol(root2))
+    x = root2[!, i]
+    xkde = kde(x, bandwidth = 1)
+    Plots.plot!(xkde.x, xkde.density, label = names(root2)[i])
+end
+
+display(p)
+
+Plots.savefig("Root_Leaf_KDE")
+
+
+heights = nodeheights(mars_tree)
+
+heightdf = DataFrame(Species = heights.axes[1][:], Depth = collect(heights))
+
+function MICompare(df, heightdf)
+com_df = innerjoin(heightdf, df, on =:Species)
+
+gdf = groupby(com_df, :Depth)
+
+root = select(gdf[1], Not([:Species, :Depth]))
+rootvals = Matrix(root)
+rootvals = vec(rootvals)
+rootkde = kde(rootvals)
+Plots.plot(rootkde.x, rootkde.density, label = "Density at Leaves")
+end
+
+for i in values(Phy_data)
+    MICompare(df)
+end
