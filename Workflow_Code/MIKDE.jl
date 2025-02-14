@@ -63,6 +63,17 @@ rootkde = kde(rootvals)
 Plots.plot!(rootkde.x, rootkde.density, label = label)
 end
 
+function RootCompare(df, heightdf, label)
+    com_df = innerjoin(heightdf, df, on =:Species)
+    
+    gdf = groupby(com_df, :Depth)
+    idx = length(gdf)
+    root = select(gdf[idx], Not([:Species, :Depth]))
+    rootvals = Matrix(root)
+    rootvals = vec(rootvals)
+    rootkde = kde(rootvals)
+    Plots.plot!(rootkde.x, rootkde.density, label = label)
+    end
 mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
 #dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
 dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/MI121124/"
@@ -75,7 +86,7 @@ heights = nodeheights(mars_tree)
 
 heightdf = DataFrame(Species = heights.axes[1][:], Depth = collect(heights))
 
-p = Plots.plot(title = "")
+p = Plots.plot(title = "Leaf Density comparison between MI strategies")
 for file in Folder
     newdir = string(dir, file, "/")
     Phy_data = Phybridge_Dict(newdir)
@@ -84,4 +95,16 @@ for file in Folder
 end
 
 display(p)
+Plots.savefig("MILeafComparison")
+
+p = Plots.plot(title = "Root Density comparison between MI strategies")
+for file in Folder
+    newdir = string(dir, file, "/")
+    Phy_data = Phybridge_Dict(newdir)
+    femur = Phy_data["femur"]
+    RootCompare(femur, heightdf, file)
+end
+
+display(p)
+Plots.savefig("MIRootComparisons")
     
