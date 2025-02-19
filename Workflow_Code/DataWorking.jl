@@ -147,7 +147,7 @@ end
 
 
 
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Data/MultipleImputes/MI_PMMPVR/"
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Data/MultipleImputes/"
 enddir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/"
 Files = readdir(dir)
 
@@ -169,7 +169,7 @@ function Phy_Bridge_mean(start_dir, end_dir, tree, max_iter, init_samples)
     #Read MI files from start_dir
     Files = readdir(start_dir)
     try
-        #mkdir(end_dir)
+        mkdir(end_dir)
     catch
         return println("Invalid Return Directory")
     end
@@ -212,7 +212,7 @@ function Phy_Bridge_mean(start_dir, end_dir, tree, max_iter, init_samples)
                         if iter == 1
                         push!(row, col[1])
                         else 
-                            val = col[2:length(col)]
+                            val = mean(col)
                             push!(row, val)
                         end
                         iter = iter + 1
@@ -227,7 +227,6 @@ function Phy_Bridge_mean(start_dir, end_dir, tree, max_iter, init_samples)
                 if trait == "Species"
                     continue
                 else
-                    sampled_df[!, trait] = mean.(sampled_df[!, trait])
                     for j in 1:max_iter              
                         results = Leaf_Prune2(mars_tree, sampled_df, trait)
                         if j == 1
@@ -260,4 +259,6 @@ function Phy_Bridge_mean(start_dir, end_dir, tree, max_iter, init_samples)
 end
 
 
-Phy_Bridge_mean(dir, string(enddir, "results_180225/"), mars_tree, 5, 1)
+for folder in Files
+    Phy_Bridge_mean(string(dir, folder, "/"), string(enddir, "results_200225/"), mars_tree, 25, 1)
+end
