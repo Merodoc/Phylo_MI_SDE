@@ -47,7 +47,7 @@ end
 
 
 #dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/MI_1lPMMnoPVR_121124/"
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/results_180125/"
 
 Phy_data = Phybridge_Dict(dir)
 
@@ -64,22 +64,7 @@ aep_femur = collect(eachrow(aep_femur)[1])
 aep_femur_kde = kde(aep_femur)
 
 
-test = Phybridge_Dict(dir)
-
-Phy_data = test
-
 using StatsKit
-
-femur = Phy_data["femur"]
-
-gdf = groupby(femur, :Species)
-
-aep_femur = select(gdf[1], Not([:Species]))
-
-aep_femur = collect(eachrow(aep_femur)[1])
-
-aep_femur_kde = kde(aep_femur)
-
 using PlotlyJS
 using Plots
 x = aep_femur_kde.x
@@ -87,7 +72,6 @@ y = aep_femur_kde.density
 
 Plots.plot(x, y)
 
-aep_femur
 
 femur = Phy_data["femur"]
 das_m = filter(:Species => ==("Dasyurus_maculatus"), femur)
@@ -198,9 +182,9 @@ mean_dict["Node 69"]
 
 Plots.savefig("Tree_Femur_STDev")
 
-Plots.plot(mars_tree, title = "Mean sampled femur trochantericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = 35*std_list, linecolor = :purple)
+Plots.plot(mars_tree, title = "Mean sampled femur trochantericfossa length", size = (1400, 800), linewidth = 2, marker_z = means, markersize = 10, linecolor = :purple)
 Plots.savefig("1LPMMnoPVR_TreeMeansbyvar")
-Plots.plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 5, line_z = std_dict)
+Plots.plot(mars_tree, title = "Standard Deviation femur trochentericfossa length", size = (1400, 800), linewidth = 5, marker_z = std_dict, markersize = 10)
 
 Plots.savefig("Tree_femur_sdev_1LPMMnoPVR")
 

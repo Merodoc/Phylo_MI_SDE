@@ -76,7 +76,7 @@ function RootCompare(df, heightdf, label)
     end
 mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
 #dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/MI121124/"
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/results_180125/"
 
 Folder = readdir(dir)
 
@@ -88,8 +88,8 @@ heightdf = DataFrame(Species = heights.axes[1][:], Depth = collect(heights))
 
 p = Plots.plot(title = "Leaf Density comparison between MI strategies")
 for file in Folder
-    newdir = string(dir, file, "/")
-    Phy_data = Phybridge_Dict(newdir)
+    newdir = string(dir, file)
+    Phy_data = Phybridge_Dict(dir)
     femur = Phy_data["femur"]
     MICompare(femur, heightdf, file)
 end
@@ -99,8 +99,8 @@ Plots.savefig("MILeafComparison")
 
 p = Plots.plot(title = "Root Density comparison between MI strategies")
 for file in Folder
-    newdir = string(dir, file, "/")
-    Phy_data = Phybridge_Dict(newdir)
+    newdir = string(dir, file)
+    Phy_data = Phybridge_Dict(dir)
     femur = Phy_data["femur"]
     RootCompare(femur, heightdf, file)
 end
