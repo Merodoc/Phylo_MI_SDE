@@ -153,7 +153,7 @@ Files = readdir(dir)
 
 
 df_dict = Dict{String, DataFrame}()
-data = CSV.read(string(dir, Files[1]), DataFrame)
+#data = CSV.read(string(dir, Files[1]), DataFrame)
 select(data, [:Species, :humerus])
 
  
@@ -260,5 +260,5 @@ end
 
 
 for folder in Files
-    Phy_Bridge_mean(string(dir, folder, "/"), string(enddir, "results_200225/"), mars_tree, 25, 1)
+    Phy_Bridge_mean(string(dir, folder, "/"), string(enddir, "results_200225", folder, "/"), mars_tree, 25, 1)
 end
