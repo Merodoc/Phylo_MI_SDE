@@ -126,8 +126,12 @@ Plots.plot(U.x, U.density)
 Plots.plot!(thyc_x, thyc_y)
 
 using Phylo
+try
+    mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
+catch
+    mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
+end
 
-mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
 import Random
 Random.seed!(123)
 
