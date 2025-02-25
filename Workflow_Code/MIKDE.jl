@@ -76,7 +76,79 @@ function RootCompare(df, heightdf, label)
     end
 mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
 #dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/results_180125/"
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/results_200225combined/"
+
+
+function TreeSTDPlot(tree, df, Title)
+    std_dict = Dict{String, Float64}()
+    mean_dict = Dict{String, Float64}()
+    species_list = Vector{String}()
+    std_list = Vector{Float64}()
+    means = Vector{Float64}()
+    p = Plots.plot(title = Title)
+    for species in reverse(getnodenames(tree))
+        println(species)
+        row = filter(:Species => ==(species), df)
+        vals = select(row, Not([:Species]))
+        vals = collect(eachrow(vals)[1])
+        x = std(vals)
+        xhat = mean(vals)
+        xhat = round(xhat, digits = 3)
+        std_dict[species] = x/xhat
+        mean_dict[species] = xhat
+        push!(species_list, species)
+        push!(means, xhat)
+        push!(std_list, round(x/xhat, digits = 2))
+    end
+    Plots.plot!(mars_tree, size = (1400, 800), linewidth = 5, marker_z = std_dict, markersize = 10)
+    display(p)
+end
+
+
+function TreeMeanPlot(tree, df, Title)
+    mean_dict = Dict{String, Float64}()
+    species_list = Vector{String}()
+    means = Vector{Float64}()
+    p = Plots.plot(title = Title)
+    for species in reverse(getnodenames(tree))
+        println(species)
+        row = filter(:Species => ==(species), df)
+        vals = select(row, Not([:Species]))
+        vals = collect(eachrow(vals)[1])
+        xhat = mean(vals)
+        xhat = round(xhat, digits = 3)
+        mean_dict[species] = xhat
+        push!(species_list, species)
+        push!(means, xhat)
+    end
+    Plots.plot!(mars_tree, size = (1400, 800), linewidth = 5, marker_z = mean_dict, markersize = 10)
+    display(p)
+end
+
+function PhyGetMeans(df)
+    newdf = select(df, Not([:Species]))
+    meanlist = Vector{Float64}()
+    for row in eachrow(newdf)
+        xhat = mean(row)
+        push!(meanlist, xhat)
+    end
+    return meanlist
+end
+
+function PhyGetSTD(df)
+    newdf = select(df, Not([:Species]))
+    stdlist = Vector{Float64}()
+    for row in eachrow(newdf)
+        σ = std(row)
+        push!(stdlist, σ)
+    end
+    return stdlist
+end
+
+
+
+
+
 
 Folder = readdir(dir)
 
@@ -88,8 +160,8 @@ heightdf = DataFrame(Species = heights.axes[1][:], Depth = collect(heights))
 
 p = Plots.plot(title = "Leaf Density comparison between MI strategies")
 for file in Folder
-    newdir = string(dir, file)
-    Phy_data = Phybridge_Dict(dir)
+    newdir = string(dir, file, "/")
+    Phy_data = Phybridge_Dict(newdir)
     femur = Phy_data["femur"]
     MICompare(femur, heightdf, file)
 end
@@ -99,12 +171,73 @@ Plots.savefig("MILeafComparison")
 
 p = Plots.plot(title = "Root Density comparison between MI strategies")
 for file in Folder
-    newdir = string(dir, file)
-    Phy_data = Phybridge_Dict(dir)
+    newdir = string(dir, file, "/")
+    Phy_data = Phybridge_Dict(newdir)
     femur = Phy_data["femur"]
     RootCompare(femur, heightdf, file)
 end
 
 display(p)
 Plots.savefig("MIRootComparisons")
-    
+
+for file in Folder
+    newdir = string(dir, file, "/")
+    Phy_data = Phybridge_Dict(newdir)
+    femur = Phy_data["femur"]
+
+    com_df = innerjoin(heightdf, femur, on =:Species)
+    TreeSTDPlot(mars_tree, femur, string("Standard Deviation for tree: ", file)) 
+    TreeMeanPlot(mars_tree, femur, string("Means for tree: ", file))
+    means = PhyGetMeans(femur)
+    stds = PhyGetSTD(femur)
+    x = com_df[!, :Depth]
+    p = Plots.scatter(x, stds, title = string("Standard Deviation vs Depth for: ", file))
+    display(p)
+    p2 = Plots.scatter(x, means, title = string("Mean vs Depth for: ", file), yerror = stds)   
+    display(p2)
+end
+
+testfile = string(dir, Folder[1], "/")
+
+Phy_data = Phybridge_Dict(testfile)
+femur = Phy_data["femur"]
+com_df = innerjoin(heightdf, femur, on =:Species)
+
+femur
+
+x = com_df[!, :Depth]
+newdata = select(com_df, Not([:Species, :Depth]))
+newdata
+
+stdlist = Vector{Float64}()
+meanlist = Vector{Float64}()
+
+
+
+depthdf = select(com_df, Not([:Species]))
+gdf = groupby(depthdf, :Depth)
+
+depthmeans = Vector{Float64}()
+depthstds = Vector{Float64}()
+depths = Vector{Float64}()
+
+for group in gdf
+    push!(depths, mean(group[!, :Depth]))
+    mat = Matrix(select(group, Not([:Depth])))
+    xhat = mean(mat)
+    σ = std(mat)
+    push!(depthmeans, xhat)
+    push!(depthstds, σ)
+end
+
+LMtest = DataFrame(Depth = x, Means = meanlist, STDs = stdlist)
+
+using GLM
+
+ols = lm(@formula(STDs ~ Depth), LMtest)
+
+Plots.scatter(depths, depthmeans, smooth = true, ribbon = depthstds)
+
+df = dataset(DataFrame, "tips")
+
+PlotlyJS.plot(com_df, x=:Depth, y=:"11326", xbingroup="x", ybingroup="y", kind="histogram2d")
