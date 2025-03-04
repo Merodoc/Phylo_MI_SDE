@@ -76,7 +76,7 @@ function RootCompare(df, heightdf, label)
     end
 mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 #dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
-dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/results_200225combined/"
+dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/results_0303combined/"
 
 
 function TreeSTDPlot(tree, df, Title)
@@ -94,7 +94,7 @@ function TreeSTDPlot(tree, df, Title)
         x = std(vals)
         xhat = mean(vals)
         xhat = round(xhat, digits = 3)
-        std_dict[species] = x/xhat
+        std_dict[species] = x
         mean_dict[species] = xhat
         push!(species_list, species)
         push!(means, xhat)
@@ -230,14 +230,14 @@ for group in gdf
     push!(depthstds, σ)
 end
 
-LMtest = DataFrame(Depth = x, Means = meanlist, STDs = stdlist)
+newdir = "Workflow_Code/results_0303combined/MI_Midas_ResultsOU2_030325/"
 
-using GLM
+data = Phybridge_Dict(newdir)
 
-ols = lm(@formula(STDs ~ Depth), LMtest)
+femur = data["femur"]
 
-Plots.scatter(depths, depthmeans, smooth = true, ribbon = depthstds)
+TreeSTDPlot(mars_tree, femur, "Test")
 
-df = dataset(DataFrame, "tips")
+stds = PhyGetSTD(femur)
 
-PlotlyJS.plot(com_df, x=:Depth, y=:"11326", xbingroup="x", ybingroup="y", kind="histogram2d")
+maximum(stds)
