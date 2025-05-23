@@ -21,7 +21,7 @@ DD.constdiff(P::OrnsteinUhlenbeck) = true
 DD.default_type(::OrnsteinUhlenbeck) = Float64
 DD.default_wiener_type(::OrnsteinUhlenbeck) = Float64
 
-θ = [0.0, 3.2, 0.1]
+θ = [0.0, 3.2, #==# 1.0 #==#]
 P_target = OrnsteinUhlenbeck(θ...)
 
 #Define Auxiliary law
@@ -155,7 +155,7 @@ DD.const_parameter_names(::Type{<:OrnsteinUhlenbeck}) = (:θ, :μ)
 DD.const_parameter_names(::Type{<:OrnsteinUhlenbeckAux}) = (:θ, :μ, :t0, :T, :vT)
 
 paths, θθ = simple_inference(
-	OrnsteinUhlenbeckAux, recording, 0.001, Dict(:s=>0.0); ρ=0.96, num_steps=10^4
+	OrnsteinUhlenbeckAux, recording, 0.001, Dict(:σ=>1.0); ρ=0.5, num_steps=10^4
 )
 
 θθ
@@ -171,18 +171,3 @@ display(p)
 
 
 
-θ = [1.0, 3.2, 9.7]
-P_target = OrnsteinUhlenbeck(θ...)
-t, v = 12.52, @SVector [3.06]
-obs = LinearGsnObs(t, v; full_obs=true)
-
-dt = 0.001
-
-tt=0.0:dt:t
-P = GuidProp(tt, P_target, OrnsteinUhlenbeckAux, obs)
-
-x0 = @SVector[2.8]
-
-X, W, Wnr = rand(P, x0)
-
-plot(X, Val(:vs_time))
