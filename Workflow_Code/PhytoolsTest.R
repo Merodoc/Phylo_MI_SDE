@@ -48,3 +48,29 @@ phenogram(primate.tree, primate.lnSkull, fsize = 0.4, ftype = "i",
           quiet = TRUE, las = 1, cex.axis = 0.8)
 
 primate.mBM_1
+
+#Taken from Sample_Workflow.Rmd
+
+impmidas.dat
+
+dat <- impmidas.dat |>
+  separate(Individual, c("Family", "Genus", "Individual"), sep = "_") |>
+  unite("Species", c(Family, Genus), sep = "_", remove = FALSE)
+dat
+
+
+
+library("PVR")
+library("plyr")
+MEANS <- ddply(dat, .(Species), summarize, mean=mean(dentary))
+
+
+marsupial.dent <- setNames(MEANS$mean, MEANS$Species)
+
+marsupial.dent
+
+marsupial.mcmc <- anc.Bayes(mars_tree2, marsupial.dent, ngen = 500000)
+
+#WHY IS THERE JUST RANDOMLY ONE 0 LENGTH BRANCH, ANGERY
+
+mars.contMap <- contMap(mars_tree2, marsupial.dent)

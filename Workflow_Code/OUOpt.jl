@@ -21,8 +21,7 @@ DD.constdiff(P::OrnsteinUhlenbeck) = true
 DD.default_type(::OrnsteinUhlenbeck) = Float64
 DD.default_wiener_type(::OrnsteinUhlenbeck) = Float64
 
-θ = [0.0, 3.2, #==# 1.0 #==#]
-P_target = OrnsteinUhlenbeck(θ...)
+
 
 #Define Auxiliary law
 
@@ -47,20 +46,7 @@ DD.b(t, x, P::OrnsteinUhlenbeckAux) = DD.B(t,P)*x + DD.β(t,P)
 DD.a(t, P::OrnsteinUhlenbeckAux) = DD.σ(t,P)*DD.σ(t,P)
 DD.constdiff(P::OrnsteinUhlenbeckAux) = true
 
-using ObservationSchemes, StaticArrays
-t, v = 12.52, @SVector [3.06]
-obs = LinearGsnObs(t, v; full_obs=true)
 
-dt = 0.001
-
-tt=0.0:dt:t
-P = GuidProp(tt, P_target, OrnsteinUhlenbeckAux, obs)
-
-x0 = @SVector[2.8]
-
-X, W, Wnr = rand(P, x0)
-
-plot(X, Val(:vs_time))
 
 # Try Parameter Inference Hardcode
 
@@ -70,15 +56,6 @@ function customkernel(θ, s::Symbol, scale=0.1)
 	θ°
 end
 
-recording = (
-    P = P_target,
-	obs = load_data(
-        ObsScheme(
-            LinearGsnObs(t, v; full_obs=true)),
-            [12.52], [v]),
-	t0 = 0.0,
-	x0_prior = KnownStartingPt(x0)
-)
 
 
 
@@ -150,24 +127,4 @@ function simple_inference(AuxLaw, recording, dt, θ; ρ=0.5, num_steps=10^4, ϵ 
     end
     paths, θθ
 end
-
-DD.const_parameter_names(::Type{<:OrnsteinUhlenbeck}) = (:θ, :μ)
-DD.const_parameter_names(::Type{<:OrnsteinUhlenbeckAux}) = (:θ, :μ, :t0, :T, :vT)
-
-paths, θθ = simple_inference(
-	OrnsteinUhlenbeckAux, recording, 0.001, Dict(:σ=>1.0); ρ=0.5, num_steps=10^4
-)
-
-θθ
-plot(θθ)
-
-p = plot(size=(1400, 800))
-for path in paths[end-10:end]
-	for i in eachindex(path)
-		plot!(p, path[i], Val(:vs_time), alpha=0.4, label="", color=["red" "steelblue"])
-	end
-end
-display(p)
-
-
 
