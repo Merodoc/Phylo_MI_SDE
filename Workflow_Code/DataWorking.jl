@@ -1,7 +1,7 @@
 include("Leaf_Prune.jl")
 
 
-mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
+mars_tree = open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 import Random
 Random.seed!(123)
 
@@ -55,11 +55,11 @@ end
 function Phy_Bridge_Sim(start_dir, end_dir, tree, max_iter, init_samples)
     #Read MI files from start_dir
     Files = readdir(start_dir)
-    try
-        mkdir(end_dir)
-    catch
-        return println("Invalid Return Directory")
-    end
+    #try
+    #    mkdir(end_dir)
+    #catch
+    #    return println("Invalid Return Directory")
+    #end
     file_number = 0
     for file in Files
         file_number = file_number + 1
@@ -147,17 +147,13 @@ end
 
 
 
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Data/MultipleImputes/"
-enddir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/"
+dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/Data/MultipleImputes/"
+enddir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/Workflow_Code/"
 Files = readdir(dir)
 
 
-df_dict = Dict{String, DataFrame}()
-data = CSV.read(string(dir, Files[1]), DataFrame)
-select(data, [:Species, :humerus])
-
  
-dir2 = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
+dir2 = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/MI_Data/"
 Files2 = readdir(dir2)
 data2 = CSV.read(string(dir2, Files2[7]), DataFrame)
 

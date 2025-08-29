@@ -129,13 +129,13 @@ root = first(nodenamefilter(isroot, tree))
 data = DataFrame()
 sp_names = Vector{String}()
 
-for i in df[!, species]
+for i in df[!, Symbol(species)]
     push!(sp_names, i)
 end
 
 sp_trait = Vector{Float64}()
 
-for i in df[!, variable]
+for i in df[!, Symbol(variable)]
     push!(sp_trait, i)
 end
 
