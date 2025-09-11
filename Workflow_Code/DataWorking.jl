@@ -1,7 +1,7 @@
 include("Leaf_Prune.jl")
 
 
-mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
+mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
 import Random
 Random.seed!(123)
 
@@ -149,11 +149,11 @@ end
 function Phy_Bridge_SimSDE(start_dir, end_dir, tree, max_iter, init_samples)
     #Read MI files from start_dir
     Files = readdir(start_dir)
-    #try
-    #    mkdir(end_dir)
-    #catch
-    #    return println("Invalid Return Directory")
-    #end
+    try
+        mkdir(end_dir)
+    catch
+        return println("Invalid Return Directory")
+    end
     file_number = 0
     for file in Files
         file_number = file_number + 1
@@ -167,6 +167,7 @@ function Phy_Bridge_SimSDE(start_dir, end_dir, tree, max_iter, init_samples)
         # Create a new empty data frame that will contain the sampled trait values
         # Remove any traits that the Multiple Imputation couldn't handle
         titles = names(data)
+
 
    
         for i in 1:init_samples
@@ -190,6 +191,7 @@ function Phy_Bridge_SimSDE(start_dir, end_dir, tree, max_iter, init_samples)
                 iter = 1
                 row = Vector()
                     for col in eachcol(species)
+                        #println(col)
                         if iter == 1
                         push!(row, col[1])
                         else 
@@ -202,7 +204,7 @@ function Phy_Bridge_SimSDE(start_dir, end_dir, tree, max_iter, init_samples)
             end
         # We should now have a data frame that has a sample per species from every variable
             trait_data = DataFrame()
-
+            #println(sampled_df[!, :Species])
             for trait in names(sampled_df)
                 trait_time = time()
                 if trait == "Species"
@@ -241,21 +243,21 @@ end
 
 
 
-dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/Data/MultipleImputes/MI_Midas/"
-enddir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/"
-Files = readdir(dir)
+#dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/Data/MultipleImputes/MI_Midas/"
+#enddir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/"
+#Files = readdir(dir)
 
 
-df_dict = Dict{String, DataFrame}()
-data = CSV.read(string(dir, Files[1]), DataFrame)
-select(data, [:Species, :humerus])
+#df_dict = Dict{String, DataFrame}()
+#data = CSV.read(string(dir, Files[1]), DataFrame)
+#select(data, [:Species, :humerus])
 
  
-#dir2 = "C:/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
+dir2 = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/MI_Data/"
 #Files2 = readdir(dir2)
 #data2 = CSV.read(string(dir2, Files2[7]), DataFrame)
 
 #Phy_Bridge_Sim(dir, string("MI_Midas_Results_030325/"), mars_tree, 5, 1)
 
-Phy_Bridge_SimSDE(dir, string("MI_Midas_ResultsOU2_030325/"), mars_tree, 5, 1)
+Phy_Bridge_SimSDE(dir2, string("MI_Midas_ResultsBM1_110925/"), mars_tree, 5, 1)
 
