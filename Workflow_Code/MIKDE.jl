@@ -74,9 +74,12 @@ function RootCompare(df, heightdf, label)
     rootkde = kde(rootvals)
     Plots.plot!(rootkde.x, rootkde.density, label = label)
     end
-mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
-#dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/Sampled2l_241024/"
-dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/results_0303combined/"
+#mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
+mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
+
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/New_Results0925/"
+
+#dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/results_0303combined/"
 
 
 function TreeSTDPlot(tree, df, Title)

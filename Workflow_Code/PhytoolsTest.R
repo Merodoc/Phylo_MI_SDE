@@ -48,3 +48,30 @@ phenogram(primate.tree, primate.lnSkull, fsize = 0.4, ftype = "i",
           quiet = TRUE, las = 1, cex.axis = 0.8)
 
 primate.mBM_1
+
+mars_tree <- read.tree("MarS_TimeTree.nwk")
+Mars <- read.csv("mars.csv", header=TRUE)
+Mars_Avg <- read.csv("mars_avg.csv")
+
+mars_avg2 <- Mars_Avg[which(Mars_Avg$X %in% mars_tree$tip.label),]
+rownames(mars_avg2) <- mars_avg2$X
+mars_avg2 <- mars_avg2[match(mars_tree$tip.label, rownames(mars_avg2)),]
+
+mars.data <- as.matrix(mars_avg2$femur)
+mars.data <- t(mars.data)
+mars.data <- data.frame(mars.data)
+names(mars.data) <- mars_avg2[,1]
+mars.data
+fit <- fastAnc(mars_tree, mars.data, vars = TRUE, CI = TRUE)
+fit
+mars.ace <- summary(fit)
+mars.contMap <- contMap(mars_tree, mars.data, anc.states = fit$ace, plot = FALSE)
+mars.contMap <- setMap(cordylid.contMap, viridisLite::viridis(n=10, direction = 1))
+plot(mars.contMap, ftype = "i", fsize = c(0.6, 0.7), leg.txt = "PC 1 (increasing armor)", lwd =3)
+
+
+fit$ace
+mars.data
+mars_tree
+
+plotTree(mars_tree)
