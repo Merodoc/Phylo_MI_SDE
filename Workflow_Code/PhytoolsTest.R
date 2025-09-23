@@ -64,10 +64,15 @@ names(mars.data) <- mars_avg2[,1]
 mars.data
 fit <- fastAnc(mars_tree, mars.data, vars = TRUE, CI = TRUE)
 fit
+
 mars.ace <- summary(fit)
 mars.contMap <- contMap(mars_tree, mars.data, anc.states = fit$ace, plot = FALSE)
 mars.contMap <- setMap(cordylid.contMap, viridisLite::viridis(n=10, direction = 1))
-plot(mars.contMap, ftype = "i", fsize = c(0.6, 0.7), leg.txt = "PC 1 (increasing armor)", lwd =3)
+plot(mars.contMap, ftype = "i", fsize = c(0.6, 0.7), leg.txt = "Trochanteric Fossa Length", lwd =3)
+
+mars.mcmc <- anc.Bayes(mars_tree, mars.data, ngen = 500000)
+
+
 
 
 fit$ace

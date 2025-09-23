@@ -195,7 +195,7 @@ function Phy_Bridge_SimSDE(start_dir, end_dir, tree, max_iter, init_samples)
                         if iter == 1
                         push!(row, col[1])
                         else 
-                            val = mean(col)
+                            val = log(mean(col))
                             push!(row, val)
                         end
                         iter = iter + 1
@@ -259,5 +259,5 @@ dir2 = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/MI_Data/"
 
 #Phy_Bridge_Sim(dir, string("MI_Midas_Results_030325/"), mars_tree, 5, 1)
 
-Phy_Bridge_SimSDE(dir2, string("MI_Midas_ResultsBM1_110925/"), mars_tree, 5, 1)
+Phy_Bridge_SimSDE(dir2, string("MI_Midas_ResultsLog_220925_3/"), mars_tree, 5, 1)
 
