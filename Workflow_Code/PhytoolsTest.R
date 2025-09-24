@@ -38,7 +38,7 @@ data(primate.tree)
 data(primate.data)
 primate.lnSkull <- setNames(log(primate.data$Skull_length), rownames(primate.data))
 
-par(mfrow = c(1,2))
+par(mfrow = c(1,1))
 primate.widthMap <- edge.widthMap(primate.tree, primate.lnSkull)
 plot(primate.widthMap, color = palette()[4], 
      legend = "log(skull length)", border = TRUE, fsize = 0.4, mar = c(4.1, 1.1, 2.1, 0.1))
@@ -49,7 +49,7 @@ phenogram(primate.tree, primate.lnSkull, fsize = 0.4, ftype = "i",
 
 
 
-mars_tree <- read.tree("MarS_TimeTree.nwk")
+mars_tree <- read.tree("newtree.nwk")
 Mars <- read.csv("mars.csv", header=TRUE)
 Mars_Avg <- read.csv("mars_avg.csv")
 
@@ -67,7 +67,7 @@ mars.data
 fit <- fastAnc(mars_tree, mars.data, vars = TRUE, CI = TRUE)
 fit
 
-
+par(mfrow = c(1,1))
 mars.contMap <- contMap(mars_tree, mars.data, anc.states = fit$ace, plot = FALSE)
 mars.contMap <- setMap(mars.contMap, viridisLite::viridis(n=10, direction = 1))
 plot(mars.contMap, ftype = "i", fsize = c(0.6, 0.7), leg.txt = "Trochanteric Fossa Length", lwd =3)
@@ -82,3 +82,26 @@ mars.data
 mars_tree
 
 plotTree(mars_tree)
+
+bbridge <- read.csv("FemurMeans.csv", header = TRUE)
+
+mars.contMap <- contMap(mars_tree, bbridge.leaves, anc.states = bbridge.anc, plot = FALSE)
+mars.contMap <- setMap(mars.contMap, viridisLite::viridis(n=10, direction = 1))
+plot(mars.contMap, ftype = "i", fsize = c(0.6, 0.7), leg.txt = "Trochanteric Fossa Length", lwd =3)
+
+fit <- fastAnc(mars_tree, bbridge.leaves, vars = TRUE, CI = TRUE)
+fit
+
+par(mfrow = c(1,1))
+mars.contMap <- contMap(mars_tree, bbridge.leaves, anc.states = fit$ace, plot = FALSE)
+mars.contMap <- setMap(mars.contMap, viridisLite::viridis(n=10, direction = 1))
+plot(mars.contMap, ftype = "i", fsize = c(0.6, 0.7), leg.txt = "Trochanteric Fossa Length", lwd =3)
+
+
+bbridge
+bbridge.leaves <- bbridge$femur[1:35]
+bbridge.leaves
+names(bbridge.leaves) <- bbridge$Species[1:35]
+
+bbridge.anc <- bbridge$femur[36:69] 
+names(bbridge.anc) <- bbridge$Species[36:69]

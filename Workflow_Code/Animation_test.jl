@@ -107,19 +107,19 @@ function Phylo_Bridge_anim(start, fin, fin_time, anc, dt, samples)
 return paths
 end
 
-bridgeanim = Phylo_Bridge_anim(11.24, 29.5, 12.52, 6.26, 0.01, 10)
-gif(bridgeanim)
+bridgeanim = Phylo_Bridge_anim(12.19, 17.55, 12.52, 6.26, 0.01, 10)
+
 t = 0:0.01:12.52
 p = plot(200, legend = false)
-xlims!(0, 12.52)
+xlims!(6.26, 12.52)
 ylims!(0, 30)
 anim = @animate for x = 1:626
-    for i in 1:10
+    for i in 1:1
         y = collect(eachcol(bridgeanim)[i])
         if x == 626
             push!(p, i, t[x], y[x])
         end
-        push!(p, i, t[x], y[x])
+        push!(p, i, reverse(t)[x], y[x])
         push!(p, 201-i, reverse(t)[x], reverse(y)[x])
     end
 end
@@ -127,3 +127,4 @@ end
 gif(anim)
 
 
+gif(anim, "BMAnimdasdas.gif", fps = 15)

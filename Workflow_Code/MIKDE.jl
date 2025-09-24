@@ -3,7 +3,6 @@ using Phylo
 using CSV
 using Plots
 using StatsKit
-using PlotlyJS
 using Statistics
 
 
@@ -77,7 +76,7 @@ function RootCompare(df, heightdf, label)
 #mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
 
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/New_Results0925/"
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/MI_Midas_ResultsBM1_220925_2/"
 
 #dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/results_0303combined/"
 
@@ -169,6 +168,7 @@ for file in Folder
     MICompare(femur, heightdf, file)
 end
 
+
 display(p)
 Plots.savefig("MILeafComparison")
 
@@ -181,7 +181,7 @@ for file in Folder
 end
 
 display(p)
-Plots.savefig("MIRootComparisons")
+Plots.savefig("MIRootComparisons_BMvsOU")
 
 for file in Folder
     newdir = string(dir, file, "/")
@@ -233,14 +233,19 @@ for group in gdf
     push!(depthstds, σ)
 end
 
-newdir = "Workflow_Code/results_0303combined/MI_Midas_ResultsOU2_030325/"
+newdir = "Workflow_Code/results_200225combined/results_200225MI_Midas/"
 
 data = Phybridge_Dict(newdir)
 
 femur = data["femur"]
 
+means = PhyGetMeans(femur)
+
 TreeSTDPlot(mars_tree, femur, "Test")
 
+newdf = DataFrame(Species = femur[!, :Species], femur = means)
 stds = PhyGetSTD(femur)
 
+
+CSV.write("FemurMeans.csv", newdf)
 maximum(stds)
