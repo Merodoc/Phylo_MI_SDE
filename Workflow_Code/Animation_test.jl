@@ -14,16 +14,18 @@ Bridge.σ(t,x,P::OrnsteinUhlenbeck) = P.σ
 
 #simulate ornstein uhlenbeck using Euler scheme
 
-W = sample(0:0.01:10, Wiener())
+W = sample(0:0.01:3, Wiener())
 X = solve(EulerMaruyama(), 0.1, W, OrnsteinUhlenbeck(2.0,1.0))
 plot(X, level = "X")
 X
 
 p = plot(X, level = "X")
 
-p = plot(1)
-xlims!(0, 10)
-ylims!(-2, 5)
+p = plot(1, legend = false)
+title!("Standard Brownian Motion")
+
+xlims!(0, 2)
+ylims!(-2, 2)
 X2t = reverse(X.tt)
 X2y = reverse(X.yy)
 anim = @animate for x = 1:length(X.tt)
@@ -31,7 +33,7 @@ anim = @animate for x = 1:length(X.tt)
     #push!(p, 2, X2t[x], X2y[x])
 end
 
-gif(anim, "BMAnim.gif", fps = 15)
+gif(anim, "BMAnim.gif", fps = 30)
 
 function WienerAnim(t, dt, n)
     Y = Vector{Vector{Float64}}()
@@ -54,7 +56,7 @@ function WienerAnim(t, dt, n)
 return anim
 end
     
-test = WienerAnim(10, 1, 10)
+test = WienerAnim(2, 0.1, 50)
 
 gif(test)
 
@@ -107,19 +109,19 @@ function Phylo_Bridge_anim(start, fin, fin_time, anc, dt, samples)
 return paths
 end
 
-bridgeanim = Phylo_Bridge_anim(12.19, 17.55, 12.52, 6.26, 0.01, 10)
+bridgeanim = Phylo_Bridge_anim(0., 0., 5., 2.5, 0.01, 10)
 
-t = 0:0.01:12.52
+t = 0:0.01:5
 p = plot(200, legend = false)
-xlims!(6.26, 12.52)
-ylims!(0, 30)
-anim = @animate for x = 1:626
-    for i in 1:1
+xlims!(0, 5)
+ylims!(-5, 5)
+anim = @animate for x = 1:250
+    for i in 1:10
         y = collect(eachcol(bridgeanim)[i])
-        if x == 626
+        if x == 250
             push!(p, i, t[x], y[x])
         end
-        push!(p, i, reverse(t)[x], y[x])
+        push!(p, i, t[x], y[x])
         push!(p, 201-i, reverse(t)[x], reverse(y)[x])
     end
 end
@@ -127,4 +129,23 @@ end
 gif(anim)
 
 
-gif(anim, "BMAnimdasdas.gif", fps = 15)
+gif(anim, "BMAnimdasdas10.gif", fps = 60)
+
+
+B = sample(0:0.1:2, WienerBridge(2,0), start)
+
+bridgeanim
+
+t = 0:0.01:5
+p = plot(200, legend = false)
+xlims!(0, 5)
+ylims!(-5, 5)
+    for i in 1:10
+        y = collect(eachcol(bridgeanim)[i])
+        if x == 250
+            push!(p, i, t[x], y[x])
+        end
+        push!(p, i, t[x], y[x])
+        push!(p, 201-i, reverse(t)[x], reverse(y)[x])
+    end
+end
