@@ -39,7 +39,7 @@ Bridge.b(t,x,P::OrnsteinUhlenbeck) = -P.β*x
 Bridge.σ(t,x,P::OrnsteinUhlenbeck) = P.σ
 
 
-function Phylo_BridgeSDE(start, fin, fin_time, anc, dt, samples, β = 0.0, σ = 2.0)
+function Phylo_BridgeSDE(start, fin, fin_time, anc, dt, samples, β = 0.0, σ = 1.0)
     #start = start value
     #fin = final value
     #fin_time = total time
@@ -267,11 +267,12 @@ function Leaf_PruneSDE(tree, df, variable, species = "Species", dt = 0.01, sampl
     #Currently this iterates through all the nodes in the tree from leaves to root and returns the list
 root = first(nodenamefilter(isroot, tree))
 data = DataFrame()
-sp_names = Vector{String}()
+#sp_names = Vector{Int64}()
 
-for i in df[!, species]
-    push!(sp_names, i)
-end
+#for i in df[!, Symbol(species)]
+#    print(i)
+#    push!(sp_names, i)
+#end
 
 sp_trait = Vector{Float64}()
 
@@ -280,7 +281,7 @@ for i in df[!, variable]
 end
 
 
-data[!, :Species] = sp_names
+data[!, :Species] = getleafnames(mars_tree)
 data[!, :Variable] = sp_trait
 v = []
 children = ["NA", "NA"]
@@ -292,6 +293,7 @@ data[!, :Child2] .= 0.
 data[!,:Child2Val] .= 0.
 data[!,:BridgeMean] .= 0.
 data[!, :BridgeVar] .= 0.
+#println(data)
 iter = 0
 idx = 0
 #vals = start_vals
@@ -323,12 +325,13 @@ for leaf in leaves
         #test that all the children of the parent leaf are leaves
     ch = getchildren(tree, parent)
     children = [getnodename(tree, ch[1]), getnodename(tree,ch[2])]
+    println(getnodename(tree, ch[1]))
     if getnodename(tree, ch[1]) ∈ leaves && getnodename(tree, ch[2]) ∈ leaves
-
         #Pull existing trait values from the data frame
         row1 = filter(row -> row.Species == getnodename(tree, ch[1]), data)
         row2 = filter(row -> row.Species == getnodename(tree, ch[2]), data)
         val1 = row1.Variable[1]
+        #println(row1)
         val2 = row2.Variable[1]
         bridgelen = Vector{Float64}()
     #print(getnodename(mars_tree, parent))
