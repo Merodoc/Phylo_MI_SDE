@@ -70,6 +70,8 @@ s = 12.52
 v = 3.06
 xt = ℝ{1}(3.06)
 x0 = ℝ{1}(2.8)
+θ1 = ℝ{1}(1.5)
+θ2 = ℝ{1}(1.0)
 W = sample(0:dt:s, WienerBridge(s,v), 2.81)
 X = solve(EulerMaruyama(), x0, W, Pˣ)
 
@@ -80,7 +82,7 @@ obs = [x0, xt]
 obs = [2.8, 3.06]
 Σdiagel = 1.0
 Σ = @SMatrix[Σdiagel]
-L = @SMatrix[1.0 0.0]
+L = @SMatrix[1.0]
 
 θ_init = copy(θˣ)
 Pˣ = RadialOU(θ_init...)
@@ -93,6 +95,34 @@ set_observations!(model_setup, [L for _ in P̃], [Σ for _ in P̃], obs, obs_tim
 set_imputation_grid!(model_setup, dt)
 set_x0_prior!(model_setup, KnownStartingPt(x0))
 
-initialise!(eltype(x0), model_setup, Vern7, false, NoChangePt)
+initialise!(eltype(x0), model_setup, Vern7(), false, NoChangePt(100))
 
-obs_times
+impute_step = Imputation(NoBlocking(), 0.99, Vern7())
+
+pu1 = ParamUpdate(MetropolisHastingsUpdt(), # the type of parameter update
+                  1,                        # which coordinate is updated
+                  θ_init,                   # needed just for the dimension of the parameter
+                  UniformRandomWalk(0.5, true), # transition kernel
+                  ImproperPosPrior(),       # prior
+                  UpdtAuxiliary(            # auxiliary information
+                      Vern7(),              # ODE solver
+                      true)) 
+
+pu2 = ParamUpdate(MetropolisHastingsUpdt(), # the type of parameter update
+                  2,                        # which coordinate is updated
+                  θ_init,                   # needed just for the dimension of the parameter
+                  UniformRandomWalk(0.5, true), # transition kernel
+                  ImproperPosPrior(),       # prior
+                  UpdtAuxiliary(            # auxiliary information
+                      Vern7(),              # ODE solver
+                      true))                      
+
+mcmc_setup = MCMCSetup(impute_step, pu1, pu2)
+
+schedule = MCMCSchedule(111, [[1,2], [1,3]],
+              (save=5, verbose=10, warm_up=7,
+                readjust=(x->x%20==0), fuse=(x->false)))
+
+out = mcmc(mcmc_setup, schedule, model_setup)
+
+θ_init

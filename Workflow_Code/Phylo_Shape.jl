@@ -46,7 +46,7 @@ return df_dict
 end 
 
 
-dir = "C:/PhD/Phylo_MI_SDE/Workflow_Code/results_0303combined/"
+dir = "Workflow_Code/results_200225combined/"
 #dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/results_180125/"
 
 Phy_data = Phybridge_Dict(dir)

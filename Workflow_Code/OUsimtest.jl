@@ -18,6 +18,41 @@ X, W, Wnr = rand(P, x0)
 
 plot(X, Val(:vs_time))
 
+
+#sampling multiple paths
+success, ll = GP.rand!(P, X, W, Val(:ll), x0; Wnr=Wiener())
+
+
+function simple_smoothing(P, y1)
+	X, W, Wnr = rand(P, y1)
+	X°, W° = trajectory(P)
+
+	ll = loglikhd(P, X)
+	paths = []
+
+	for i in 1:10^4
+		_, ll° = GP.rand!(P, X°, W°, Val(:ll), y1; Wnr=Wnr)
+		if rand() < exp(ll°-ll)
+			X, W, X°, W° = X°, W°, X, W
+			ll = ll°
+		end
+		i % 400 == 0 && append!(paths, [deepcopy(X)])
+	end
+	paths
+end
+paths = simple_smoothing(P, x0)
+
+using Plots, Colors
+cm = colormap("RdBu")
+kwargs = (alpha=0.3, label="")
+p = plot(paths[1], Val(:vs_time); color=cm[1], kwargs...)
+for (i,x) in enumerate(paths[2:end])
+	plot!(p, x, Val(:vs_time); color=cm[4*i], kwargs...)
+end
+display(p)
+
+
+
 recording = (
     P = P_target,
 	obs = load_data(
@@ -34,7 +69,7 @@ DD.const_parameter_names(::Type{<:OrnsteinUhlenbeck}) = (:θ, :μ)
 DD.const_parameter_names(::Type{<:OrnsteinUhlenbeckAux}) = (:θ, :μ, :t0, :T, :vT)
 
 paths, θθ = simple_inference(
-	OrnsteinUhlenbeckAux, recording, 0.001, Dict(:σ=>0.0); ρ=0.8, num_steps=10^4, ϵ = 0.1
+	OrnsteinUhlenbeckAux, recording, 0.001, Dict(:σ=>1.0); ρ=0.8, num_steps=10^4, ϵ = 0.3
 )
 
 θθ
@@ -85,10 +120,10 @@ recording = (
 
 
 DD.const_parameter_names(::Type{<:OrnsteinUhlenbeck}) = (:μ)
-DD.const_parameter_names(::Type{<:OrnsteinUhlenbeckAux}) = (:θ, :μ, :t0, :T, :vT)
+DD.const_parameter_names(::Type{<:OrnsteinUhlenbeckAux}) = (:μ, :t0, :T, :vT)
 
 paths, θθ = simple_inference(
-	OrnsteinUhlenbeckAux, recording, 0.001, Dict(:σ=>1.0, :θ => 0.0); ρ=0.8, num_steps=10^4, ϵ = 0.3
+	OrnsteinUhlenbeckAux, recording, 0.001, Dict(:σ=>0.5, :θ => 0.0); ρ=0.8, num_steps=10^4, ϵ = 0.3
 )
 
 θθ
