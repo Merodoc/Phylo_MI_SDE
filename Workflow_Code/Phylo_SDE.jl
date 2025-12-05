@@ -81,7 +81,8 @@ using Phylo
 #C:/PhD/Phylo_MI_SDE/Workflow_Code/ for campus
 mars_tree = open(parse(RootedTree), Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/Mars_TimeTree.nwk"))
 
-plot(mars_tree)
+plot(mars_tree, size = (1400, 800), linewidth = 5, linecolor = :Orange)
+savefig("DefaultTree")
 plot(hummers, marker_z = trait)
 trait = OU_Evolve
 using CSV

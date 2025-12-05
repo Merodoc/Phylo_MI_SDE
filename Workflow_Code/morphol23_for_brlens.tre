@@ -1,0 +1,58 @@
+#NEXUS
+[ID: 0287574096]
+begin taxa;
+	dimensions ntax=23;
+	taxlabels
+		Trichosurus_vulpecula
+		Pseudocheirus_peregrinus
+		Hypsiprymnodon_moschatus
+		Aepyprymnus_rufescens
+		Bettongia_penicillata
+		Potorous_tridactylus
+		Lagostrophus_fasciatus
+		Simosthenurus_occidentalis
+		Dorcopsulus_vanheurni
+		Dorcopsis_veterum
+		Thylogale_billardierii
+		Dendrolagus_bennettianus
+		Dendrolagus_matschiei
+		Petrogale_brachyotis
+		Onychogalea_unguifera
+		Setonix_brachyurus
+		Lagorchestes_conspicillatus
+		Lagorchestes_hirsutus
+		Protemnodon_anak
+		Macropus_fuliginosus
+		Macropus_robustus
+		Macropus_eugenii
+		Wallabia_bicolor
+		;
+end;
+begin trees;
+	translate
+		1	Trichosurus_vulpecula,
+		2	Pseudocheirus_peregrinus,
+		3	Hypsiprymnodon_moschatus,
+		4	Aepyprymnus_rufescens,
+		5	Bettongia_penicillata,
+		6	Potorous_tridactylus,
+		7	Lagostrophus_fasciatus,
+		8	Simosthenurus_occidentalis,
+		9	Dorcopsulus_vanheurni,
+		10	Dorcopsis_veterum,
+		11	Thylogale_billardierii,
+		12	Dendrolagus_bennettianus,
+		13	Dendrolagus_matschiei,
+		14	Petrogale_brachyotis,
+		15	Onychogalea_unguifera,
+		16	Setonix_brachyurus,
+		17	Lagorchestes_conspicillatus,
+		18	Lagorchestes_hirsutus,
+		19	Protemnodon_anak,
+		20	Macropus_fuliginosus,
+		21	Macropus_robustus,
+		22	Macropus_eugenii,
+		23	Wallabia_bicolor
+		;
+   tree con_all_compat = [&R] (1:0.05170098,(2:0.1091842,(3:0.05974037,(((4:0.095584,5:0.02913408):0.05525015,6:0.03497897):0.03341639,((7:0.09638121,8:0.7784862):0.03647412,((9:0.02714095,10:0.02973769):0.1569257,((11:0.02710344,((12:0.03549766,13:0.02524253):0.3593719,14:0.01289223):0.05886755):0.0102359,(15:0.3136335,(16:0.07357133,((17:0.009820985,18:0.01212349):0.0900335,(19:0.1520486,(20:0.03000489,(21:0.01970578,(22:0.03104216,23:0.1423569):0.04738148):0.007935916):0.1559646):0.03324533):0.06603313):0.01078922):0.0121578):0.01349714):0.1691752):0.5186754):0.1888821):0.2039122):0.001);
+end;

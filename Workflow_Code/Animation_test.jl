@@ -1,6 +1,6 @@
 using Bridge
 using Plots
-
+using DataFrames
 # Define a diffusion process 
 
 struct OrnsteinUhlenbeck <: ContinuousTimeProcess{Float64}
@@ -22,6 +22,8 @@ X
 p = plot(X, level = "X")
 
 p = plot(1)
+xlims!(0, 10)
+ylims!(-2, 5)
 X2t = reverse(X.tt)
 X2y = reverse(X.yy)
 anim = @animate for x = 1:length(X.tt)
@@ -29,7 +31,7 @@ anim = @animate for x = 1:length(X.tt)
     #push!(p, 2, X2t[x], X2y[x])
 end
 
-gif(anim)
+gif(anim, "BMAnim.gif", fps = 15)
 
 function WienerAnim(t, dt, n)
     Y = Vector{Vector{Float64}}()
@@ -106,7 +108,7 @@ return paths
 end
 
 bridgeanim = Phylo_Bridge_anim(11.24, 29.5, 12.52, 6.26, 0.01, 10)
-
+gif(bridgeanim)
 t = 0:0.01:12.52
 p = plot(200, legend = false)
 xlims!(0, 12.52)

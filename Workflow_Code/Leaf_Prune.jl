@@ -4,8 +4,6 @@ using DataFrames
 
 # Read in Data
 # Will need to do similar data matching to that in R
-mars = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/mars.csv", DataFrame)
-mars_avg = CSV.read("C:/PhD/Phylo_MI_SDE/Workflow_Code/Imp_Mars_PVR25new5.csv", DataFrame, types = [String, Float64])
 using Statistics
 using Bridge
 #C:/PhD/Phylo_MI_SDE/Workflow_Code
