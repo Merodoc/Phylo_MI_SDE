@@ -62,7 +62,6 @@ X
 using Plots
 
 plot(X)
-plot!(X2)
 
 function Phylo_BridgeSDEtest(start, fin, fin_time, anc, dt, samples, SDE = OrnsteinUhlenbeck(0.0, 1.0))
     #start = start value

@@ -259,5 +259,5 @@ dir2 = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/MI_Data/"
 
 #Phy_Bridge_Sim(dir, string("MI_Midas_Results_030325/"), mars_tree, 5, 1)
 
-Phy_Bridge_SimSDE(dir2, string("MI_Midas_ResultsLog_031225/"), mars_tree, 5, 1)
+Phy_Bridge_SimSDE(dir2, string("MI_Midas_ResultsLog_171225/"), mars_tree, 5, 1)
 
