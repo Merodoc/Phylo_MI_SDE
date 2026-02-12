@@ -91,22 +91,54 @@ function Phylo_BridgeSDEtest(start, fin, fin_time, anc, dt, samples, SDE = Ornst
 return Xhat
 end
 
-B = sample(0:0.01:1, WienerBridge(5.,5.), 5.)
-P = BridgeProp(OrnsteinUhlenbeck(1.,0.1), 0:0.01:1, (5., 5.), 1.)
-P2 = BridgeProp(BMDrift(0.5, 1.), 0:0.01:10, (0.,0.),1.)
-P3 = BridgeProp(OUMean(1.,5., 0.1), 0:0.01:1, (5.,5.),1.)
-P4 = BridgeProp(CIR(0.5,0.,1.), 0:0.01:10,(0.,0.),1.)
-P5 = BridgeProp(WF(0.5,0.,1.), 0:0.01:10,(0.,0.),1.)
 
 
-X = solve(EulerMaruyama(), 0.1,B, P)
-X2 = solve(EulerMaruyama(), 0.1, B, P2)
+
+B = sample(0:0.01:5, WienerBridge(5.,5.), 5.)
+P2 = BridgeProp(BMDrift(0.5, 0.1), 0:0.01:5, (5.,5.),5.)
+P3 = BridgeProp(OUMean(1.,5., 0.1), 0:0.01:5, (5.,5.),5.)
+P4 = BridgeProp(CIR(1,5.,0.1), 0:0.01:5,(5.,5.),5.)
+P5 = BridgeProp(WF(1,5.,.1), 0:0.01:5,(5.,5.),5.)
+
+
+X2 = solve(EulerMaruyama(), B, P2)
 X3 = solve(EulerMaruyama(), B, P3)
-X4 = solve(EulerMaruyama(), 0.1, B, P4)
-X5 = solve(EulerMaruyama(), 0.1, B, P5)
+X4 = solve(EulerMaruyama(), B, P4)
+X5 = solve(EulerMaruyama(), B, P5)
 
-plot(X)
 plot(X2)
-plot(X3)
+plot!(X3)
 plot!(X4)
 plot!(X5)
+
+
+p = plot()
+OUspread = Float64[]
+
+using Statistics
+using StatsKit
+using KernelDensity
+
+Models = [P3, P4, P5]
+p = plot()
+for model in Models
+    midpoints = Float64[]
+    for i in 1:1000
+        B = sample(0:0.01:5, WienerBridge(5.,5.), 5.)
+        Y = solve(EulerMaruyama(), 5., B, model)
+        push!(midpoints, Y.yy[250])
+    end
+    
+    kernel = kde(midpoints)
+    plot!(p, kernel.x, kernel.density)
+end
+
+display(p)
+
+
+
+
+kernel = kde(OUspread)
+plot(kernel.x, kernel.density)
+Y.yy[250]
+
