@@ -43,7 +43,7 @@ end
 
 
 
-function Treesim(Model, ntips)
+function Treesim(Model, ntips, rootval = 0.)
     nu = Ultrametric(ntips);
     tree = rand(nu)
     
@@ -51,7 +51,7 @@ function Treesim(Model, ntips)
     
     for node in iter 
         if isroot(tree, node)
-            setnodedata!(tree, node, "Trait", 0.)
+            setnodedata!(tree, node, "Trait", rootval)
         elseif hasinbound(tree, node)
             inbound = getinbound(tree, node)
             len = getlength(tree, inbound)
