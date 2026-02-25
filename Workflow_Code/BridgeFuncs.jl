@@ -1,4 +1,7 @@
+
 using Bridge
+
+z = 3
 
 struct OrnsteinUhlenbeck <: ContinuousTimeProcess{Float64}
     β::Float64 #drift parameter 
@@ -53,16 +56,6 @@ Bridge.σ(t,x,P::WF) = (P.σ*x*(1-x))^1/2
 
 
 
-
-
-X5 = Bridge.solve(Euler(), 0.1, W, CIR(20.0, 0.0, 1.0));
-
-X   
-
-using Plots
-
-plot(X)
-
 function Phylo_BridgeSDEtest(start, fin, fin_time, anc, dt, samples, SDE = OrnsteinUhlenbeck(0.0, 1.0))
     #start = start value
     #fin = final value
@@ -92,7 +85,7 @@ return Xhat
 end
 
 
-
+"""
 
 B = sample(0:0.01:5, WienerBridge(5.,5.), 5.)
 P2 = BridgeProp(BMDrift(0.5, 0.1), 0:0.01:5, (5.,5.),5.)
@@ -106,19 +99,19 @@ X3 = solve(EulerMaruyama(), B, P3)
 X4 = solve(EulerMaruyama(), B, P4)
 X5 = solve(EulerMaruyama(), B, P5)
 
-plot(X2)
-plot!(X3)
-plot!(X4)
-plot!(X5)
+#plot(X2)
+#plot!(X3)
+#plot!(X4)
+#plot!(X5)
 
 
-p = plot()
+#p = plot()
 OUspread = Float64[]
 
-using Statistics
-using StatsKit
+
 using KernelDensity
 
+using Plots
 Models = [P3, P4, P5]
 p = plot()
 for model in Models
@@ -142,3 +135,4 @@ kernel = kde(OUspread)
 plot(kernel.x, kernel.density)
 Y.yy[250]
 
+"""
