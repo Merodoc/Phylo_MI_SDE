@@ -2,7 +2,6 @@ using DataFrames
 using Phylo
 using CSV
 using Plots
-using StatsKit
 using Statistics
 
 
@@ -76,7 +75,7 @@ function RootCompare(df, heightdf, label)
 #mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
 
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/MI_Midas_ResultsBM1_220925_2/"
+dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/OUMeanTest/"
 
 #dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/results_0303combined/"
 
@@ -162,7 +161,7 @@ heightdf = DataFrame(Species = heights.axes[1][:], Depth = collect(heights))
 
 p = Plots.plot(title = "Leaf Density comparison between MI strategies")
 for file in Folder
-    newdir = string(dir, file, "/")
+    newdir = string(dir, file)
     Phy_data = Phybridge_Dict(newdir)
     femur = Phy_data["femur"]
     MICompare(femur, heightdf, file)
