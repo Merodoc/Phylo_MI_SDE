@@ -1,8 +1,12 @@
+using Pkg
+Pkg.activate(".")
+
 using DataFrames
 using Phylo
 using CSV
 using Plots
 using Statistics
+
 
 
 function Phybridge_Dict(dir)
@@ -73,10 +77,12 @@ function RootCompare(df, heightdf, label)
     Plots.plot!(rootkde.x, rootkde.density, label = label)
     end
 #mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
-mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/newtree.nwk"))
+mars_tree = Phylo.open(parsenewick, Phylo.path("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 
-dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/OUMeanTest/"
+dir = "/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/1DTests_Compiled2/"
 
+#dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/OUMeanTest/"
+#dir = /home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/OUMeanTest/
 #dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/results_0303combined/"
 
 
@@ -160,8 +166,11 @@ heights = nodeheights(mars_tree)
 heightdf = DataFrame(Species = heights.axes[1][:], Depth = collect(heights))
 
 p = Plots.plot(title = "Leaf Density comparison between MI strategies")
+
+using KernelDensity
+
 for file in Folder
-    newdir = string(dir, file)
+    newdir = string(dir, file, "/")
     Phy_data = Phybridge_Dict(newdir)
     femur = Phy_data["femur"]
     MICompare(femur, heightdf, file)
@@ -171,15 +180,20 @@ end
 display(p)
 Plots.savefig("MILeafComparison")
 
-p = Plots.plot(title = "Root Density comparison between MI strategies")
+p = Plots.plot(title = "Root Density comparison between SDE models")
 for file in Folder
     newdir = string(dir, file, "/")
     Phy_data = Phybridge_Dict(newdir)
     femur = Phy_data["femur"]
-    RootCompare(femur, heightdf, file)
-end
-
+    try
+        RootCompare(femur, heightdf, file)
+    catch
+        continue
+    end
+    end
 display(p)
+
+
 Plots.savefig("MIRootComparisons_BMvsOU")
 
 for file in Folder
@@ -203,6 +217,23 @@ testfile = string(dir, Folder[1], "/")
 
 Phy_data = Phybridge_Dict(testfile)
 femur = Phy_data["femur"]
+k = Plots.plot(title = "KDE tests")
+RootCompare(femur, heightdf, testfile)
+
+
+testfile2 = string(dir, Folder[2], "/")
+
+Phy_data = Phybridge_Dict(testfile2)
+femur = Phy_data["femur"]
+RootCompare(femur, heightdf, testfile)
+
+testfile3 = string(dir, Folder[3], "/")
+
+Phy_data = Phybridge_Dict(testfile3)
+femur = Phy_data["femur"]
+RootCompare(femur, heightdf, testfile)
+
+
 com_df = innerjoin(heightdf, femur, on =:Species)
 
 femur
@@ -232,7 +263,7 @@ for group in gdf
     push!(depthstds, σ)
 end
 
-newdir = "Workflow_Code/results_200225combined/results_200225MI_Midas/"
+newdir = "/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/1DTests_Compiled2/OUMeanTest/"
 
 data = Phybridge_Dict(newdir)
 

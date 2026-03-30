@@ -362,6 +362,6 @@ dir3 = "/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/MI_Data/"
 #Phy_Bridge_SimSDE(dir, string("MI_Midas_ResultsLog_171225/"), mars_tree, 5, 1)
 
 
-Phy_Bridge_SimSDE2(dir3, string("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/CIRTest/"), mars_tree, 5, 1, "CIR")
-Phy_Bridge_SimSDE2(dir3, string("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/WFTest/"), mars_tree, 5, 1, "WF")
-Phy_Bridge_SimSDE2(dir3, string("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/OUMeanTest/"), mars_tree, 5, 1)
+Phy_Bridge_SimSDE2(dir3, string("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/CIRTest3/"), mars_tree, 5, 1, "CIR")
+Phy_Bridge_SimSDE2(dir3, string("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/WFTest3/"), mars_tree, 5, 1, "WF")
+Phy_Bridge_SimSDE2(dir3, string("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/OUMeanTest3/"), mars_tree, 5, 1)

@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate(".")
+
 using Phylo
 using CSV
 using DataFrames
@@ -550,11 +553,11 @@ for leaf in leaves
             time = round(time, digits = 2)
             anc_time = round(bridgelen[1], digits = 2)
             if SDE == "OUMean"
-                bridgesim = Phylo_BridgeOUMean(val1, val2, time, anc_time, dt, samples, vars[1], val1/val2, vars[2])
+                bridgesim = Phylo_BridgeOUMean(val1, val2, time, anc_time, dt, samples, vars[1], (val1+val2)/2, vars[2])
             elseif SDE == "CIR"
-                bridgesim = Phylo_BridgeCIR(val1, val2, time, anc_time, dt, samples, vars[1], val1/val2, vars[2])
+                bridgesim = Phylo_BridgeCIR(val1, val2, time, anc_time, dt, samples, vars[1], (val1+val2)/2, vars[2])
             elseif SDE == "WF"
-                bridgesim = Phylo_BridgeWF(val1, val2, time, anc_time, dt, samples, vars[1], val1/val2, vars[2])
+                bridgesim = Phylo_BridgeWF(val1, val2, time, anc_time, dt, samples, vars[1], (val1+val2)/2, vars[2])
             end
             trait_sample = sample(bridgesim)
             Xhat = mean(bridgesim)
