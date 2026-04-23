@@ -7,7 +7,7 @@ using CSV
 using Plots
 using Statistics
 
-
+cd(@__DIR__)
 
 function Phybridge_Dict(dir)
     try 
@@ -76,14 +76,14 @@ function RootCompare(df, heightdf, label)
     rootkde = kde(rootvals)
     Plots.plot!(rootkde.x, rootkde.density, label = label)
     end
-#mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
-mars_tree = Phylo.open(parsenewick, Phylo.path("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
+mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
+#mars_tree = Phylo.open(parsenewick, Phylo.path("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 
-dir = "/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/1DTests_Compiled2/"
+#dir = "/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/1DTests_Compiled2/"
 
 #dir = "C:/Users/Rowan/OneDrive/Documents/GitHub/REG_PhD/Workflow_Code/OUMeanTest/"
 #dir = /home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/OUMeanTest/
-#dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/results_0303combined/"
+dir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/1DTests_Compiled2/"
 
 
 function TreeSTDPlot(tree, df, Title)
@@ -178,6 +178,8 @@ end
 
 
 display(p)
+
+#Same multiple imputation Strategy so not useful
 Plots.savefig("MILeafComparison")
 
 p = Plots.plot(title = "Root Density comparison between SDE models")
@@ -194,7 +196,7 @@ for file in Folder
 display(p)
 
 
-Plots.savefig("MIRootComparisons_BMvsOU")
+Plots.savefig("MIRootComparisons_OUvsCIR")
 
 for file in Folder
     newdir = string(dir, file, "/")
@@ -212,6 +214,11 @@ for file in Folder
     p2 = Plots.scatter(x, means, title = string("Mean vs Depth for: ", file), yerror = stds)   
     display(p2)
 end
+
+#Do phenograms here ideally
+
+
+
 
 testfile = string(dir, Folder[1], "/")
 

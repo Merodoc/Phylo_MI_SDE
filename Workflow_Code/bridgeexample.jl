@@ -127,3 +127,4 @@ X = solve(EulerMaruyama(), SVector(0., 0.), sample(tt, Wiener{SVector{2,Float64}
 
 yy = Bridge.mat(X.yy)
 plot(yy[1,:], yy[2,:], xlim=(-2, 2), ylim=(-2,2), linewidth=0.5)
+
