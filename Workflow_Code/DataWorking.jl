@@ -1,5 +1,5 @@
 include("Leaf_Prune.jl")
-
+include("TreeSim.jl")
 
 mars_tree = Phylo.open(parsenewick, Phylo.path("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 import Random

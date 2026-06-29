@@ -3,6 +3,7 @@ include("BridgeFuncs.jl")
 nu = Nonultrametric(5);
 tree = rand(nu)
 
+plot(tree)
 getroot(tree)
 
 root = collect(nodenamefilter(isroot, tree))
@@ -90,7 +91,7 @@ function TreesimBM(ntips)
     return tree
 end
 
-OUtree = Treesim(OUMean(0.1,0.,0.1), 32)
+OUtree = Treesim(OUMean(1.,0.,0.1), 32)
 
 OUDict = Dict()
 
@@ -105,3 +106,8 @@ OUDict
 plot(OUtree, line_z = collect(values(OUDict)))
 
 values(OUDict)
+
+CIRtree = Treesim(CIR(1.,0.,0.1), 32)
+WFtree = Treesim(WF(1., 0., 0.1), 32)
+
+# Need to put the leaf values into a .csv for the test simulations
