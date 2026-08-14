@@ -1,5 +1,5 @@
 using Pkg
-Pkg.activate(".")
+
 
 using DataFrames
 using Phylo
@@ -75,7 +75,18 @@ function RootCompare(df, heightdf, label)
     rootvals = vec(rootvals)
     rootkde = kde(rootvals)
     Plots.plot!(rootkde.x, rootkde.density, label = label)
-    end
+end
+
+function NodeCompare(df, heightdf, label, idx)
+    com_df = innerjoin(heightdf, df, on =:Species)
+    
+    gdf = groupby(com_df, :Depth)
+    root = select(gdf[idx], Not([:Species, :Depth]))
+    rootvals = Matrix(root)
+    rootvals = vec(rootvals)
+    rootkde = kde(rootvals)
+    Plots.plot!(rootkde.x, rootkde.density, label = label)
+end
 mars_tree = Phylo.open(parsenewick, Phylo.path("C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 #mars_tree = Phylo.open(parsenewick, Phylo.path("/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/newtree.nwk"))
 
@@ -194,9 +205,23 @@ for file in Folder
     end
     end
 display(p)
-
-
 Plots.savefig("MIRootComparisons_OUvsCIR")
+
+p = Plots.plot(title = "Quoll Ancestor Node comparison between SDE models")
+for file in Folder
+    newdir = string(dir, file, "/")
+    Phy_data = Phybridge_Dict(newdir)
+    femur = Phy_data["femur"]
+    try
+        NodeCompare(femur, heightdf, file, 3)
+    catch
+        print("Error")
+        continue
+    end
+    end
+display(p)
+
+Plots.savefig("MIQuollCompare")
 
 for file in Folder
     newdir = string(dir, file, "/")
@@ -270,7 +295,8 @@ for group in gdf
     push!(depthstds, σ)
 end
 
-newdir = "/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/1DTests_Compiled2/OUMeanTest/"
+#newdir = "/home/theaeg/Documents/PhD/Phylo_MI_SDE/Workflow_Code/1DTests_Compiled2/WFTest3"
+newdir = "C:/Users/uqrelso1/Documents/GitHub/Phylo_MI_SDE/Workflow_Code/1DTests_Compiled2/WFTest3/"
 
 data = Phybridge_Dict(newdir)
 
